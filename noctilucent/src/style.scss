@@ -1,0 +1,30 @@
+/**
+ *
+ * Please note: Do not edit this stylesheet! To make changes to the style of the
+ * site, please add your custom styles to the custom.css file.
+ *
+ */
+
+// Frameworks and plugins
+@import "compass";
+@import "960/grid";
+@import "compass-h5bp-css/h5bp";
+
+// Constants and mixins
+@import "inc/mixins";    // Custom mixins
+@import "inc/colors";    // Color scheme
+@import "inc/base";      // Base constants
+
+// Normalize
+@include h5bp-normalize;
+
+// Primary styles
+@import "inc/layout";    // Layout
+@import "inc/primary";   // Primary styles
+@import "inc/pages";     // Specific pages
+@import "inc/wordpress"; // WP classes
+@import "inc/plugins";   // Plugin styles
+
+// Misc.
+//@include h5bp-helpers; // Uncomment for helper classes
+@include h5bp-print;

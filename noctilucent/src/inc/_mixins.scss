@@ -1,0 +1,56 @@
+// =============================================================================
+// Outer Height
+//
+// Outer height in this case includes the height, padding, and border
+// properties. Margin is not included. If you use this on an inline element,
+// you will need to change the display to block or inline-block.
+//
+// Parameters
+//
+// - `outer` -- The desired outer height of the element
+// - `pt`    -- padding-top
+// - `pb`    -- padding-bottom
+// - `bt`    -- border-top
+// - `bb`    -- border-bottom
+//
+// =============================================================================
+@mixin outerheight( $outer, $pt: 0, $pb: 0, $bt: 0, $bb: 0 ) {
+    border: {
+        top: $bt;
+        bottom: $bb;
+    }
+    height: $outer - $pt - $pb - $bt - $bb;
+    padding: {
+        top: $pt;
+        bottom: $pb;
+    }
+}
+
+
+// =============================================================================
+// Outer Width
+//
+// Outer width in this case includes the width, padding, and border
+// properties. Margin is not included. If you use this on an inline element,
+// you will need to change the display to block or inline-block.
+//
+// Parameters
+//
+// - `outer` -- The desired outer width of the element
+// - `pl`    -- padding-left
+// - `pr`    -- padding-right
+// - `bl`    -- border-left
+// - `br`    -- border-right
+//
+// =============================================================================
+@mixin outerwidth( $outer, $pl: 0, $pr: 0, $bl: 0, $br: 0 ) {
+    border: {
+        left: $bl;
+        right: $br;
+    }
+    padding: {
+        left: $pl;
+        right: $pr;
+    }
+    width: $outer - $pl - $pr - $bl - $br;
+}
