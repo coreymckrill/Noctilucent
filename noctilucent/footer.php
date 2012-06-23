@@ -3,7 +3,7 @@
             <?php get_sidebar( 'footer' ); ?>
             
             <?php
-            $firstyear = new DateTime( '2011-01-01' );
+            $firstyear = new DateTime( '2012-01-01' );
             ( $firstyear->format( 'Y' ) == date( 'Y' ) ) ? $copyright = date( 'Y' ) : $copyright = $firstyear->format( 'Y' ) . ' &ndash; ' . date( 'Y' );
             ?>
 
