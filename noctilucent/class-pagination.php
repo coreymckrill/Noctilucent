@@ -11,19 +11,17 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
         /**
          * Find the total number of pages available
          */
-        function count_pages( $pages = '' ) {
-            if ( $pages == '' ) {
-                global $multipage, $numpages, $wp_query;
-                if ( is_singular() && $multipage ) {
-                    $pages = $numpages;
-                    if( ! $pages )
-                        $pages = 1;
-                } else {
-                    $pages = $wp_query->max_num_pages;
-                    if( ! $pages )
-                        $pages = 1;
-                }
-            }
+        function count_pages() {
+			global $multipage, $numpages, $wp_query;
+			if ( is_singular() && $multipage ) {
+				$pages = $numpages;
+				if( ! $pages )
+					$pages = 1;
+			} else {
+				$pages = $wp_query->max_num_pages;
+				if( ! $pages )
+					$pages = 1;
+			}
             return $pages;
         }
         
@@ -45,9 +43,26 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
         /**
          * Compile pagination link list
          */
-        function pagination( $label = true, $range = 4, $pages = '' ) {
-            $showitems = ( $range * 2 ) + 1; 
+        function pagination( $args = null ) {
+            $defaults = array(
+				'label'           => true,
+				'range'           => 4,
+				'container'       => 'nav',
+				'container_class' => 'pagination',
+				'container_id'    => '',
+				'link_first'      => '&laquo; First',
+				'link_prev'       => '&lsaquo; Previous',
+				'link_next'       => 'Next &rsaquo;',
+				'link_last'       => 'Last &raquo;'
+			);
+			$args = wp_parse_args( $args, $defaults );
+			extract( $args, EXTR_SKIP );
+			
+			if ( ! is_int( $range ) )
+				$range = $defaults['range'];
+			$showitems = ( $range * 2 ) + 1;
             
+			// Get current page number
             global $multipage, $page, $paged;
             if ( $multipage ) {
                 if ( $page ) {
@@ -55,45 +70,76 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
                 } else {
                     $paged = 1;
                 }
-            } elseif ( empty( $paged ) ) {
+            } else if ( empty( $paged ) ) {
                 $paged = 1;
             }
-            $pages = $this->count_pages( $pages );
-         
-            if ( 1 !== $pages ) {
-                $nav = "<nav class=\"pagination\">\n";
-                if ( $label == true )
-                    $nav .= "<span>Page " . $paged . " of " . $pages . "</span>\n";
-                if ( $paged > 2 && $paged > $range + 1 && $showitems < $pages )
-                    $nav .= $this->pagination_link( 1 ) . "\">&laquo; First</a>\n";
-                if ( $paged > 1 )
-                    $nav .= $this->pagination_link( $paged - 1 ) . "\">&lsaquo; Previous</a>\n";
+			
+			// Begin compilation
+            $pages = $this->count_pages();
+            if ( 1 != $pages ) {
                 
+				// Container attributes
+				if ( $container )
+					$container = ( $container == 'div' ) ? 'div' : 'nav';
+				if ( $container_class )
+					$container_class = ' class="' . esc_attr( $container_class ) . '"';
+				if ( $container_id )
+					$container_id = ' id="' . esc_attr( $container_id ) . '"';
+				
+				// Open container element
+				$nav = '';
+				if ( $container )
+					$nav .= "<" . $container . $container_id . $container_class . ">\n";
+                
+				// Link list label, ie. Page 1 of 5
+				if ( $label === true )
+                    $nav .= "<span class=\"pagination-label\">Page " . $paged . " of " . $pages . "</span>";
+					
+				// Left navigation items
+                if ( $paged > 2 && $paged > $range + 1 && $showitems < $pages )
+                    $nav .= $this->pagination_link( 1 ) . "\" class=\"pagination-first\">" . esc_html( $link_first ) . "</a>";
+                if ( $paged > 1 )
+                    $nav .= $this->pagination_link( $paged - 1 ) . "\" class=\"pagination-prev\">" . esc_html( $link_prev ) . "</a>";
+                
+				// Specific page numbers
                 for ( $i = 1; $i <= $pages; $i++ ) {
-                    if ( 1 != $pages && ( ! ( $i >= $paged + $range + 1 || $i <= $paged - $range - 1 ) || $pages <= $showitems ) )
-                        $nav .= ( $paged == $i ) ? $this->pagination_link( $i ) . "\" class=\"page-num current-page-num\">" . $i . "</a>" : $this->pagination_link( $i ) . "\" class=\"page-num\">" . $i . "</a>\n";
+					if ( ( ! ( $i >= $paged + $range + 1 || $i <= $paged - $range - 1 ) ) || ( $i <= $showitems && $paged + $range + 1 <= $showitems ) || ( $pages - $i + 1 <= $showitems && $pages - $paged + $range + 1 <= $showitems ) ) {
+                        $nav .= ( $paged == $i ) ? $this->pagination_link( $i ) . "\" class=\"page-num current-page-num\">" . $i . "</a>" : $this->pagination_link( $i ) . "\" class=\"page-num\">" . $i . "</a>";
+                    }
                 }
                 
+				// Right navigation items
                 if ( $paged < $pages )
-                    $nav .= $this->pagination_link( $paged + 1 ) . "\">Next &rsaquo;</a>\n";
+                    $nav .= $this->pagination_link( $paged + 1 ) . "\" class=\"pagination-next\">" . esc_html( $link_next ) . "</a>";
                 if ( $paged < $pages - 1 && $paged + $range - 1 < $pages && $showitems < $pages )
-                    $nav .= $this->pagination_link( $pages ) . "\">Last &raquo;</a>\n";
-                $nav .= "</nav>\n";
+                    $nav .= $this->pagination_link( $pages ) . "\" class=\"pagination-last\">" . esc_html( $link_last ) . "</a>";
+                
+				// Close container element
+				if ( $container )
+					$nav .= "\n</" . $container . ">\n";
+				
                 return $nav;
-            }
+			
+            } else {
+				
+				return false;
+			
+			}
         }
     
     } // End class Noctilucent_Pagination
 
     function noctilucent_pagination( $context = 'single', $echo = true ) {
-        $p = new Noctilucent_Pagination();
-        if ( $context == 'single' && is_singular() && 1 != $p->count_pages() ) {
+        
+		$p = new Noctilucent_Pagination();
+		
+        if ( $context == 'single' && is_singular() ) {
             if ( $echo == true ) {
                 echo $p->pagination();
             } else {
                 return $p->pagination();
             }
-        } else if ( $context == 'multi' && ! is_singular() && 1 != $p->count_pages() ) {
+        } else if ( $context == 'archive' && ! is_singular() ) {
             if ( $echo == true ) {
                 echo $p->pagination();
             } else {
@@ -105,7 +151,10 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
             } else {
                 return $p->count_pages();
             }
-        }
+        } else {
+			return false;
+		}
+		
     }
 
 } // End if
