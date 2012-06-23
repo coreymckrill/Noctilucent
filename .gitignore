@@ -1,0 +1,38 @@
+# Numerous always-ignore extensions
+*.diff
+*.err
+*.orig
+*.log
+*.rej
+*.swo
+*.swp
+*.vi
+*~
+*.lnk
+
+# OS or Editor folders
+.DS_Store
+.cache
+.project
+.settings
+nbproject
+thumbs.db
+
+# Sass / Compass
+.sass-cache
+
+# Komodo
+*.komodoproject
+.komodotools
+
+# Other files
+sprites*.png
+
+# Folders
+.hg
+.svn
+publish
+.idea
+extras
+Assets
+
