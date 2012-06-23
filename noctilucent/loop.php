@@ -21,7 +21,7 @@ if ( is_category() ) {
     $nocti_search_label = ( $nocti_search_count == 1 ) ? 'result' : 'results';
     $nocti_archive_title = $nocti_search_count . ' search ' . $nocti_search_label . ' for &ldquo;' . get_search_query() . '&rdquo;';
 }
-if ( $nocti_archive_title !== '' ) : ?>
+if ( $nocti_archive_title != '' ) : ?>
 
                 <header>
                     <h1><?php echo $nocti_archive_title; ?></h1>
@@ -47,7 +47,7 @@ endwhile;
 // Pagination for blog archives
 if ( ! is_singular() && 1 != noctilucent_pagination( 'count', false ) ) : ?>
                 <footer>
-                    <?php noctilucent_pagination( 'multi' ); ?>
+                    <?php noctilucent_pagination( 'archive' ); ?>
 
                 </footer>
 <?php endif;
