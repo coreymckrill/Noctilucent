@@ -5,7 +5,7 @@
 <!--[if gt IE 8]><!--> <html class="no-js" <?php language_attributes(); ?>> <!--<![endif]-->
 <head>
     
-	<meta charset="utf-8" />
+	<meta charset="<?php bloginfo( 'charset' ); ?>" />
 	
     <link rel="dns-prefetch" href="<?php echo noctilucent_get_protocol(); ?>//ajax.googleapis.com" />
 	
@@ -16,8 +16,8 @@
 	
     <?php // Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons ?>
     
-    <title><?php wp_title( '&laquo;', true, 'right' ); ?> <?php bloginfo( 'name' ); ?></title>
-    <meta name="description" content="" />
+    <title><?php wp_title( '' ); ?></title>
+    <meta name="description" content="<?php bloginfo( 'description' ); ?>" />
     
     <meta name="viewport" content="width=device-width" />
     <!--[if IE]><meta http-equiv="imagetoolbar" content="false" /><![endif]-->
@@ -42,7 +42,7 @@
                 'container'         => 'nav',
                 'container_id'      => 'nav-primary',
                 'theme_location'    => 'primary',
-				'fallback_cb'       => false
+				'fallback_cb'       => 'noctilucent_page_menu'
             ) );
             ?>
 
