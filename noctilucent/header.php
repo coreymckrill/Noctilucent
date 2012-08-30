@@ -16,7 +16,7 @@
 	
     <?php // Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons ?>
     
-    <title><?php wp_title( '' ); ?></title>
+    <title><?php wp_title( '|', true, 'right' ); ?></title>
     <meta name="description" content="<?php bloginfo( 'description' ); ?>" />
     
     <meta name="viewport" content="width=device-width" />
@@ -31,20 +31,20 @@
 		  // chromium.org/developers/how-tos/chrome-frame-getting-started ?>
 	<!--[if lt IE 7]><p class="chromeframe">Your browser is <em>ancient!</em> <a href="http://browsehappy.com/">Upgrade to a different browser</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to experience this site.</p><![endif]-->
 
-    <div id="container">
-        <header>
-            <hgroup>
-				<h1><a href="<?php echo home_url(); ?>/"><?php bloginfo( 'name' ); ?></a></h1>
-				<p id="description"><?php bloginfo( 'description' ); ?></p>
-			</hgroup>
-            <?php
-            wp_nav_menu( array(
-                'container'         => 'nav',
-                'container_id'      => 'nav-primary',
-                'theme_location'    => 'primary',
-				'fallback_cb'       => 'noctilucent_page_menu'
-            ) );
-            ?>
-
-        </header>
-        <div id="main" role="main">
+	<header id="header-banner" role="banner">
+		<hgroup>
+			<h1><a href="<?php echo home_url(); ?>/"><?php bloginfo( 'name' ); ?></a></h1>
+			<p class="blog-description"><?php bloginfo( 'description' ); ?></p>
+		</hgroup>
+	</header>
+	
+	<?php
+	wp_nav_menu( array(
+		'container'         => 'nav',
+		'container_id'      => 'nav-primary',
+		'theme_location'    => 'primary',
+		'fallback_cb'       => 'noctilucent_page_menu'
+	) );
+	?>
+	
+    <div id="main" role="main">
