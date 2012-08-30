@@ -12,7 +12,7 @@ endif; ?>
 
             <aside id="comments">
                 <header>
-                    <h3><?php comments_number('No responses', 'One response', '% responses' ); ?> to &ldquo;<?php the_title(); ?>&rdquo;</h3>
+                    <p><?php comments_number('No responses', 'One response', '% responses' ); ?> to &ldquo;<?php the_title(); ?>&rdquo;</p>
                 </header>
                 
                 <?php comment_form(); ?>
