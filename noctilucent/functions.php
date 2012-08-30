@@ -63,7 +63,7 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
     function noctilucent_enqueue_scripts() {
 		
 		// Modernizr
-		$modernizr_version = '2.5.3';
+		$modernizr_version = '2.6.1';
 		wp_register_script( 'modernizr', get_stylesheet_directory_uri() . '/js/modernizr-' . $modernizr_version . '.min.js', array(), $modernizr_version );
 		wp_enqueue_script( 'modernizr' );
 		
