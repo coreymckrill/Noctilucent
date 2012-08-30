@@ -7,18 +7,22 @@
 						<span class="post-comment-status"><?php ( comments_open() ) ? comments_popup_link( 'No comments', '1 comment', '% comments', 'comments-link' ) : ''; ?></span>
 						<?php edit_post_link( 'Edit', ' | ', ''); ?>
                     </header>
-                    <?php the_content( 'Continue reading &ldquo;' . the_title( '', '', false ) . '&rdquo; &raquo;' ); ?>
+                    <?php if ( is_search() ) {
+						the_excerpt();
+					} else {
+						the_content( 'Continue reading &ldquo;' . the_title( '', '', false ) . '&rdquo; &raquo;' );
+					} ?>
                     <footer>
-                        <?php
-                        //Post pagination
+                        <?php //Post pagination
                         noctilucent_pagination( 'single' );
-                        
-                        // Post Meta
-                        if ( has_category() || has_tag() ) : ?>
-
-						<span class="post-categories"><?php echo ( has_category() ) ? 'Categories: ' : ''; the_category( ', ' ); ?></span>
+                        ?>
+						
+						<?php // Post Meta
+                        if ( has_category() && noctilucent_categorized_blog() ) : ?>
+						<span class="post-categories">Categories: <?php the_category( ', ' ); ?></span>
+						<?php endif; ?>
+						<?php if ( has_tag() ) : ?>
 						<span class="post-tags"><?php the_tags(); ?></span>
-
                         <?php endif; ?>
 
                     </footer>
