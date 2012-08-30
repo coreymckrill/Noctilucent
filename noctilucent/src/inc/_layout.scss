@@ -1,50 +1,24 @@
 // =============================================================================
-// Layout styles
+// Susy default overrides
 // =============================================================================
 
-/**
- * 960 Grid System ~ Core CSS.
- * Learn more ~ http://960.gs/
- *
- * Licensed under GPL and MIT.
- *
- */
+//$total-columns: 12;
+//$column-width: 4em;
+//$gutter-width: 1em;
+//$grid-padding: $gutter-width;
+//$container-width: false;
+//$container-style: magic;
+//$from-direction: left;
+//$omega-float: opposite-position( $from-direction );
 
-$ninesixty-grid-width: 960px;
-$ninesixty-gutter-width: 20px;
-$ninesixty-columns: 4;
+// =============================================================================
+// Layout
+// =============================================================================
 
-#container {
-    @include grid-container;
-    > header, #main, > footer {
-        @include h5bp-clearfix;
-        width: $ninesixty-grid-width;
-    }
-    > header {
-        hgroup {
-            @include grid-unit-base;
-            @include grid-width( 2 );
-        }
-		nav {
-            @include grid-unit-base;
-            @include grid-width( 2 );
-		}
-    }
+body {
+	@include container;
+	> header, > nav, > #main, > footer {
+		@include span-columns( 12 omega );
+	}
 }
 
-#main {
-    > .menu-primary-container {
-        @include grid-unit-base;
-        @include grid-width( 4 );
-    }
-    > .content {
-        @include grid-unit-base;
-        @include grid-width( 3 );
-		//@include alpha;
-		//padding-left: ( $ninesixty-gutter-width / 2 );
-    }
-    > .sidebar {
-        @include grid-unit-base;
-        @include grid-width( 1 );
-    }
-}

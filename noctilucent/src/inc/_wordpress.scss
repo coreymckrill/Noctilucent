@@ -1,36 +1,61 @@
+// =============================================================================
+// WordPress image class styles
+// =============================================================================
+
+.aligncenter, .alignleft, .alignright {
+	@include rhythm( 0.5, 0, 0, 0.5 );
+}
 .aligncenter, div.aligncenter {
-    display: block;
+	display: block;
     margin-left: auto;
     margin-right: auto;
 }
 .alignleft {
     @include float( left );
+	margin-right: 1em;
 }
 .alignright {
     @include float( right );
+	margin-left: 1em;
+}
+.alignnone {
+	@include rhythm( 1, 0, 0, 0 );
+	margin-right: 0.5em;
+	vertical-align: bottom;
 }
 .wp-caption {
-    background: {
-        color: $color-b95;
+    @include rhythm( 0, 0, 0, 1 );
+	background: {
+        color: $light-95;
     }
     border: {
-        color: $color-b85;
+        color: $light-85;
         style: solid;
         width: 1px;
     }
     @include border-radius( 3px );
-    margin: 10px;
-    padding-top: 4px;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
     text-align: center;
     img {
-        border: 0 none;
+        @include rhythm( 0, 0.5, 0.25, 0 );
+		border: 0 none;
         margin: 0;
-        padding: 0;
     }
     p.wp-caption-text {
-        @include font-size( $base-font-size * 0.83 );
-        line-height: 1.06;
-        margin: 0;
-        padding: 0 4px 5px;
+        @include adjust-font-size-to( $base-font-size * 0.83 );
+        @include rhythm( 0, 0, 0.25, 0 );
+		margin-top: -1px;
     }
+}
+.gallery {
+	margin: auto;
+	.gallery-item {
+		@include rhythm( 0.5, 0, 0, 0.5 );
+		text-align: center;
+	}
+	.gallery-caption {
+		@include adjust-font-size-to( $base-font-size * 0.83 );
+		margin-left: 0;
+	}
 }

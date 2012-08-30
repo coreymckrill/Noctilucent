@@ -54,3 +54,9 @@
     }
     width: $outer - $pl - $pr - $bl - $br;
 }
+
+
+// Rename compass-h5bp clearfix mixin
+@mixin h5bp-clearfix {
+	@include micro-clearfix;
+}

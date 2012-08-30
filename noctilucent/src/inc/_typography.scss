@@ -1,0 +1,44 @@
+// =============================================================================
+// Fonts
+// =============================================================================
+
+
+
+// =============================================================================
+// Vertical rhythm
+// =============================================================================
+
+body {
+	@include establish-baseline;
+	@include baseline-grid-background( $base-line-height );
+}
+
+h1 {
+	$f: $base-font-size * 2.00;
+	@include adjust-font-size-to( $f );
+	@include rhythm( 0, 0, 0, 1, $f );
+}
+h2 {
+	$f: $base-font-size * 1.50;
+	@include adjust-font-size-to( $f );
+	@include rhythm( 0, 0, 0, 1, $f );
+}
+h3 {
+	$f: $base-font-size * 1.17;
+	@include adjust-font-size-to( $f );
+	@include rhythm( 0, 0, 0, 1, $f );
+}
+h4, h5, h6, p { @include adjust-font-size-to( $base-font-size ); }
+
+blockquote, h4, h5, h6, header, nav, ol, p, ul {
+	@include rhythm( 0, 0, 0, 1 );
+}
+
+article {
+	@include rhythm( 0, 0, 0, 2 );
+}
+
+input, select, textarea {
+	@include adjust-font-size-to( $base-font-size );
+	@include rhythm( 0, 0, 0, 0 );
+}
