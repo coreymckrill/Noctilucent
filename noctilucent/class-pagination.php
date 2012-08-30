@@ -8,17 +8,27 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
     
     class Noctilucent_Pagination {
         
+		function __construct() {
+			
+			global $multipage, $numpages, $wp_query, $page, $paged;
+			$this->multipage     = $multipage;
+			$this->numpages      = $numpages;
+			$this->max_num_pages = $wp_query->max_num_pages;
+			$this->page          = $page;
+			$this->paged         = $paged;
+			
+		}
+		
         /**
          * Find the total number of pages available
          */
         function count_pages() {
-			global $multipage, $numpages, $wp_query;
-			if ( is_singular() && $multipage ) {
-				$pages = $numpages;
+			if ( is_singular() && $this->multipage ) {
+				$pages = $this->numpages;
 				if( ! $pages )
 					$pages = 1;
 			} else {
-				$pages = $wp_query->max_num_pages;
+				$pages = $this->max_num_pages;
 				if( ! $pages )
 					$pages = 1;
 			}
@@ -30,8 +40,7 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
          * Note: the closing > is not included.
          */
         function pagination_link( $i ) {
-            global $multipage;
-            if ( is_singular() && $multipage ) {
+            if ( is_singular() && $this->multipage ) {
                 $link = _wp_link_page( $i );
                 $link = preg_replace( '/">/', '', $link );
             } else {
@@ -63,15 +72,14 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
 			$showitems = ( $range * 2 ) + 1;
             
 			// Get current page number
-            global $multipage, $page, $paged;
-            if ( $multipage ) {
-                if ( $page ) {
-                    $paged = $page;
+            if ( $this->multipage ) {
+                if ( $this->page ) {
+                    $this->paged = $this->page;
                 } else {
-                    $paged = 1;
+                    $this->paged = 1;
                 }
-            } else if ( empty( $paged ) ) {
-                $paged = 1;
+            } else if ( empty( $this->paged ) ) {
+                $this->paged = 1;
             }
 			
 			// Begin compilation
@@ -93,25 +101,25 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
                 
 				// Link list label, ie. Page 1 of 5
 				if ( $label === true )
-                    $nav .= "<span class=\"pagination-label\">Page " . $paged . " of " . $pages . "</span>";
+                    $nav .= "<span class=\"pagination-label\">Page " . $this->paged . " of " . $pages . "</span>";
 					
 				// Left navigation items
-                if ( $paged > 2 && $paged > $range + 1 && $showitems < $pages )
+                if ( $this->paged > 2 && $this->paged > $range + 1 && $showitems < $pages )
                     $nav .= $this->pagination_link( 1 ) . "\" class=\"pagination-first\">" . esc_html( $link_first ) . "</a>";
-                if ( $paged > 1 )
-                    $nav .= $this->pagination_link( $paged - 1 ) . "\" class=\"pagination-prev\">" . esc_html( $link_prev ) . "</a>";
+                if ( $this->paged > 1 )
+                    $nav .= $this->pagination_link( $this->paged - 1 ) . "\" class=\"pagination-prev\">" . esc_html( $link_prev ) . "</a>";
                 
 				// Specific page numbers
                 for ( $i = 1; $i <= $pages; $i++ ) {
-					if ( ( ! ( $i >= $paged + $range + 1 || $i <= $paged - $range - 1 ) ) || ( $i <= $showitems && $paged + $range + 1 <= $showitems ) || ( $pages - $i + 1 <= $showitems && $pages - $paged + $range + 1 <= $showitems ) ) {
-                        $nav .= ( $paged == $i ) ? $this->pagination_link( $i ) . "\" class=\"page-num current-page-num\">" . $i . "</a>" : $this->pagination_link( $i ) . "\" class=\"page-num\">" . $i . "</a>";
+					if ( ( ! ( $i >= $this->paged + $range + 1 || $i <= $this->paged - $range - 1 ) ) || ( $i <= $showitems && $this->paged + $range + 1 <= $showitems ) || ( $pages - $i + 1 <= $showitems && $pages - $this->paged + $range + 1 <= $showitems ) ) {
+                        $nav .= ( $this->paged == $i ) ? $this->pagination_link( $i ) . "\" class=\"page-num current-page-num\">" . $i . "</a>" : $this->pagination_link( $i ) . "\" class=\"page-num\">" . $i . "</a>";
                     }
                 }
                 
 				// Right navigation items
-                if ( $paged < $pages )
-                    $nav .= $this->pagination_link( $paged + 1 ) . "\" class=\"pagination-next\">" . esc_html( $link_next ) . "</a>";
-                if ( $paged < $pages - 1 && $paged + $range - 1 < $pages && $showitems < $pages )
+                if ( $this->paged < $pages )
+                    $nav .= $this->pagination_link( $this->paged + 1 ) . "\" class=\"pagination-next\">" . esc_html( $link_next ) . "</a>";
+                if ( $this->paged < $pages - 1 && $this->paged + $range - 1 < $pages && $showitems < $pages )
                     $nav .= $this->pagination_link( $pages ) . "\" class=\"pagination-last\">" . esc_html( $link_last ) . "</a>";
                 
 				// Close container element
@@ -129,21 +137,24 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
     
     } // End class Noctilucent_Pagination
 
-    function noctilucent_pagination( $context = 'single', $echo = true ) {
+	/**
+	 * Pagination template tag
+	 */
+    function noctilucent_pagination( $context = 'single', $echo = true, $args = null ) {
         
 		$p = new Noctilucent_Pagination();
 		
         if ( $context == 'single' && is_singular() ) {
             if ( $echo == true ) {
-                echo $p->pagination();
+                echo $p->pagination( $args );
             } else {
-                return $p->pagination();
+                return $p->pagination( $args );
             }
         } else if ( $context == 'archive' && ! is_singular() ) {
             if ( $echo == true ) {
-                echo $p->pagination();
+                echo $p->pagination( $args );
             } else {
-                return $p->pagination();
+                return $p->pagination( $args );
             }
         } else if ( $context == 'count' ) {
             if ( $echo == true ) {
@@ -158,5 +169,3 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
     }
 
 } // End if
-
-?>
