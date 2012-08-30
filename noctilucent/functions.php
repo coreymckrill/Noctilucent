@@ -1,8 +1,13 @@
 <?php
 
+/**
+ * Includes
+ */
 get_template_part( 'class', 'pagination' );
-if ( is_admin() )
+get_template_part( 'class', 'breadcrumbs' );
+if ( is_admin() ) {
     get_template_part( 'class', 'admin' );
+}
 
 
 /**
@@ -21,17 +26,9 @@ function noctilucent_get_protocol() {
 if ( ! function_exists( 'noctilucent_enqueue_styles' ) ) {
     function noctilucent_enqueue_styles() {
 		
-		// Fonts
-		wp_register_style( 'googlefont', noctilucent_get_protocol() . '//fonts.googleapis.com/css?family=Calligraffitti', array(), '' );
-		wp_enqueue_style( 'googlefont' );
-		
-		// Main stylesheet, compiled from Sass
-		wp_register_style( 'style', get_stylesheet_directory_uri() . '/css/style.css', array( 'googlefont' ), '' );
+		// Main stylesheet
+		wp_register_style( 'style', get_stylesheet_directory_uri() . '/css/style.css', array() );
 		wp_enqueue_style( 'style' );
-		
-		// Custom stylesheet, for minor edits
-		wp_register_style( 'custom', get_stylesheet_directory_uri() . '/css/custom.css', array( 'style' ), '' );
-		wp_enqueue_style( 'custom' );
 		
     }
     add_action( 'wp_enqueue_scripts', 'noctilucent_enqueue_styles' );
@@ -45,7 +42,7 @@ if ( ! function_exists( 'noctilucent_enqueue_styles' ) ) {
 if ( ! function_exists( 'noctilucent_load_jquery' ) ) {
     function noctilucent_load_jquery() {
 		
-		$jquery_version = '1.7.1';
+		$jquery_version = '1.8.0';
 		
 		if ( ! is_admin() ) {
 			wp_deregister_script( 'jquery' );
@@ -67,7 +64,7 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 		
 		// Modernizr
 		$modernizr_version = '2.5.3';
-		wp_register_script( 'modernizr', get_stylesheet_directory_uri() . '/js/modernizr.min.js', array(), $modernizr_version );
+		wp_register_script( 'modernizr', get_stylesheet_directory_uri() . '/js/modernizr-' . $modernizr_version . '.min.js', array(), $modernizr_version );
 		wp_enqueue_script( 'modernizr' );
 		
 		// Comment reply functions
@@ -78,12 +75,14 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 		wp_register_script( 'plugins', get_stylesheet_directory_uri() . '/js/plugins.js', array( 'jquery' ), '', true );
 		wp_enqueue_script( 'plugins' );
 		wp_localize_script( 'plugins', 'plugins_js_vars', array(
-			'jquery' => home_url() . '/' . WPINC . '/js/jquery/jquery.js'
+			'ajax'           => admin_url( 'admin-ajax.php', noctilucent_get_protocol() . '//' ),
+			'home_url'       => home_url(),
+			'jquery'         => home_url() . '/' . WPINC . '/js/jquery/jquery.js'
 		) );
 		
 		// Custom scripts
-		wp_register_script( 'script', get_stylesheet_directory_uri() . '/js/script.js', array( 'plugins' ), '', true );
-		wp_enqueue_script( 'script' );
+		wp_register_script( 'main', get_stylesheet_directory_uri() . '/js/main.js', array( 'plugins' ), '', true );
+		wp_enqueue_script( 'main' );
 
     }
     add_action( 'wp_enqueue_scripts', 'noctilucent_enqueue_scripts' );
@@ -128,7 +127,7 @@ if ( ! function_exists( 'noctilucent_head_cleanup' ) ) {
  */
 if ( ! function_exists( 'noctilucent_disable_feed' ) ) {
 	function noctilucent_disable_feed() {
-		wp_die( 'No feed available, please visit our <a href="' . get_bloginfo( 'url' ) . '">home page</a>.' );
+		wp_die( 'No feed available, please visit our <a href="' . home_url() . '">home page</a>.' );
 	}
 	//add_action( 'do_feed', 'noctilucent_disable_feed', 1 );
 	//add_action( 'do_feed_rdf', 'noctilucent_disable_feed', 1 );
@@ -189,8 +188,8 @@ if ( ! function_exists( 'noctilucent_sidebars' ) ) {
 			'description'   => 'Widgets placed here will appear in the side column.',
 			'before_widget' => '<li id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</li>',
-			'before_title'  => '<h2 class="widgettitle">',
-			'after_title'   => '</h2>'
+			'before_title'  => '<h3 class="widgettitle">',
+			'after_title'   => '</h3>'
 		) );
 		register_sidebar( array(
 			'id'            => 'sidebar-footer',
@@ -198,8 +197,8 @@ if ( ! function_exists( 'noctilucent_sidebars' ) ) {
 			'description'   => 'Widgets placed here will appear in the footer.',
 			'before_widget' => '<li id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</li>',
-			'before_title'  => '<h2 class="widgettitle">',
-			'after_title'   => '</h2>'
+			'before_title'  => '<h3 class="widgettitle">',
+			'after_title'   => '</h3>'
 		) );
     }
     add_action( 'widgets_init', 'noctilucent_sidebars' );
@@ -214,6 +213,11 @@ if ( ! function_exists( 'noctilucent_body_classes' ) ) {
     function noctilucent_body_classes( $classes ) {
         if ( is_singular() )
             $classes[] = 'singular';
+		if ( is_page() ) {
+			global $post;
+			$slug = $post->post_name;
+			$classes[] = 'page-' . $slug;
+		}
         return $classes;
     }
     add_filter( 'body_class', 'noctilucent_body_classes' );
@@ -294,4 +298,193 @@ if ( ! function_exists( 'noctilucent_comments' ) ) {
     }
 }
 
-?>
+
+/**
+ * Modification of wp_page_menu to allow for custom container.
+ * Emulates wp_nav_menu.
+ * Added arguments:
+ * - container
+ * - container_id
+ */
+if ( ! function_exists( 'noctilucent_page_menu' ) ) {
+	function noctilucent_page_menu( $args = array() ) {
+			$defaults = array(
+				'sort_column' => 'menu_order, post_title',
+				'menu_class' => 'menu',
+				'echo' => true,
+				'link_before' => '',
+				'link_after' => '',
+				'container' => 'nav',
+				'container_id' => 'nav-primary'
+			);
+			$args = wp_parse_args( $args, $defaults );
+			$args = apply_filters( 'wp_page_menu_args', $args );
+	
+			$menu = '';
+	
+			$list_args = $args;
+	
+			// Show Home in the menu
+			if ( ! empty($args['show_home']) ) {
+					if ( true === $args['show_home'] || '1' === $args['show_home'] || 1 === $args['show_home'] )
+							$text = __('Home');
+					else
+							$text = $args['show_home'];
+					$class = '';
+					if ( is_front_page() && !is_paged() )
+							$class = 'class="current_page_item"';
+					$menu .= '<li ' . $class . '><a href="' . home_url( '/' ) . '" title="' . esc_attr($text) . '">' . $args['link_before'] . $text . $args['link_after'] . '</a></li>';
+					// If the front page is a page, add it to the exclude list
+					if (get_option('show_on_front') == 'page') {
+							if ( !empty( $list_args['exclude'] ) ) {
+									$list_args['exclude'] .= ',';
+							} else {
+									$list_args['exclude'] = '';
+							}
+							$list_args['exclude'] .= get_option('page_on_front');
+					}
+			}
+	
+			$list_args['echo'] = false;
+			$list_args['title_li'] = '';
+			$menu .= str_replace( array( "\r", "\n", "\t" ), '', wp_list_pages($list_args) );
+	
+			if ( $menu )
+				$menu = '<ul>' . $menu . '</ul>';
+	
+			$container = '';
+			if ( $list_args['container'] )
+				$container = ( $list_args['container'] == 'div' ) ? 'div' : 'nav';
+			
+			$container_id = '';
+			if ( $list_args['container_id'] )
+				$container_id = ' id="' . esc_attr( $list_args['container_id'] ) . '"';
+	
+			if ( $container )
+				$menu = '<' . $container . $container_id . ' class="' . esc_attr($args['menu_class']) . '">' . $menu . "</" . $container . ">\n";
+			
+			$menu = apply_filters( 'wp_page_menu', $menu, $args );
+			if ( $args['echo'] )
+				echo $menu;
+			else
+				return $menu;
+	}
+}
+
+/**
+ * Pare down the inline gallery CSS to allow for more flexibility in the
+ * stylesheets
+ */
+if ( ! function_exists( 'noctilucent_edit_gallery_style' ) ) {
+	function noctilucent_edit_gallery_style( $input ) {
+		$match = preg_match( '/\#(.*) {\n/', $input, $selector );
+		$match = preg_match( '/float: (.*);\n/', $input, $float );
+		$match = preg_match( '/width: (.*)%;\n/', $input, $itemwidth );
+		$match = preg_match( '/\n\t\t<div(.*)$/', $input, $div );
+		$output = "
+		<style type='text/css'>
+			#{$selector[1]} .gallery-item {
+				float: {$float[1]};
+				width: {$itemwidth[1]}%;
+			}
+		</style>
+		";
+		$output .= '<div' . $div[1];
+		echo $output;
+	}
+	add_filter( 'gallery_style', 'noctilucent_edit_gallery_style' );
+}
+
+/**
+ * Generate section header based on the type of archive page
+ */
+if ( ! function_exists( 'noctilucent_section_header' ) ) {
+	function noctilucent_section_header() {
+		
+		global $wp_query;
+		
+		$section_header = '';
+		
+		if ( is_category() ) {
+			$section_header = 'Archive for &ldquo;' . single_cat_title( '', false ) . '&rdquo;';
+		} elseif ( is_tag() ) {
+			$section_header = 'Posts tagged &ldquo;' . single_tag_title( '', false ) . '&rdquo;';
+		} elseif ( is_day() ) {
+			$section_header = 'Archive for ' . get_the_time('F jS, Y');
+		} elseif ( is_month() ) {
+			$section_header = 'Archive for ' . get_the_time('F, Y');
+		} elseif ( is_year() ) {
+			$section_header = 'Archive for ' . get_the_time('Y');
+		} elseif ( is_author() ) {
+			$curauth = get_user_by( 'slug', get_query_var('author_name') );
+			$section_header = 'Posts by ' . $curauth->display_name;
+		} elseif ( is_search() ) {
+			$search_count = $wp_query->found_posts;
+			$search_label = ( $search_count == 1 ) ? 'result' : 'results';
+			$section_header = $search_count . ' search ' . $search_label . ' for &ldquo;' . get_search_query() . '&rdquo;';
+		}
+		
+		return $section_header;
+	
+	}
+}
+
+/**
+* Returns true if a blog has more than 1 category
+*
+* From https://github.com/Automattic/_s/blob/master/inc/template-tags.php
+*/
+if ( ! function_exists( 'noctilucent_categorized_blog' ) ) {
+	function noctilucent_categorized_blog() {
+		if ( false === ( $all_the_cool_cats = get_transient( 'all_the_cool_cats' ) ) ) {
+			// Create an array of all the categories that are attached to posts
+			$all_the_cool_cats = get_categories( array(
+				'hide_empty' => 1,
+			) );
+			
+			// Count the number of categories that are attached to the posts
+			$all_the_cool_cats = count( $all_the_cool_cats );
+			
+			set_transient( 'all_the_cool_cats', $all_the_cool_cats );
+		}
+		
+		if ( '1' != $all_the_cool_cats ) {
+			// This blog has more than 1 category so _s_categorized_blog should return true
+			return true;
+		} else {
+			// This blog has only 1 category so _s_categorized_blog should return false
+			return false;
+		}
+	}
+}
+
+/**
+ * Filter the title tag to add site info
+ */
+if ( ! function_exists( 'noctilucent_title_tag' ) ) {
+	function noctilucent_title_tag( $title, $sep, $seplocation ) {
+		
+		global $page, $paged;
+		$site_label = get_bloginfo( 'name' );
+		
+		$site_description = get_bloginfo( 'description', 'display' );
+		if ( $site_description && ( is_home() || is_front_page() ) )
+			$site_label .= " $sep $site_description";
+		
+		if ( ! $title )
+			return $site_label;
+		
+		if ( $seplocation == 'right' ) {
+			$output = "$title $site_label";
+		} else {
+			$output = "$site_label $title";
+		}
+		
+		if ( $paged >= 2 || $page >= 2 )
+			$output .= " $sep " . sprintf( 'Page %s', max( $paged, $page ) );
+		
+		return $output;
+	
+	}
+	add_filter( 'wp_title', 'noctilucent_title_tag', 10, 3 );
+}
