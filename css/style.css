@@ -339,20 +339,6 @@ body > header, body > nav, body > #main, body > footer {
   display: inline;
 }
 
-/* line 11, ../src/inc/_typography.scss */
-body {
-  background-image: -webkit-gradient(linear, 50% 100%, 50% 0%, color-stop(5%, rgba(0, 0, 0, 0.5)), color-stop(5%, rgba(0, 0, 0, 0)));
-  background-image: -webkit-linear-gradient(bottom, rgba(0, 0, 0, 0.5) 5%, rgba(0, 0, 0, 0) 5%);
-  background-image: -moz-linear-gradient(bottom, rgba(0, 0, 0, 0.5) 5%, rgba(0, 0, 0, 0) 5%);
-  background-image: -o-linear-gradient(bottom, rgba(0, 0, 0, 0.5) 5%, rgba(0, 0, 0, 0) 5%);
-  background-image: -ms-linear-gradient(bottom, rgba(0, 0, 0, 0.5) 5%, rgba(0, 0, 0, 0) 5%);
-  background-image: linear-gradient(bottom, rgba(0, 0, 0, 0.5) 5%, rgba(0, 0, 0, 0) 5%);
-  -webkit-background-size: 100% 24px;
-  -moz-background-size: 100% 24px;
-  -o-background-size: 100% 24px;
-  background-size: 100% 24px;
-  background-position: left top;
-}
 /* line 66, ../../../../../../../../../../../Ruby192/lib/ruby/gems/1.9.1/gems/compass-0.13.alpha.0/frameworks/compass/stylesheets/compass/typography/_vertical_rhythm.scss */
 body html {
   font-size: 100%;
@@ -446,9 +432,16 @@ input, select, textarea {
 }
 /* line 19, ../src/inc/_primary.scss */
 #header-banner h1 {
+  font-size: 3em;
+  line-height: 1.5em;
+  margin-top: 0em;
+  padding-top: 0em;
+  padding-bottom: 0em;
+  margin-bottom: 0.5em;
+  position: relative;
   z-index: 1;
 }
-/* line 21, ../src/inc/_primary.scss */
+/* line 25, ../src/inc/_primary.scss */
 #header-banner h1 a {
   color: inherit;
   text-decoration: inherit;
@@ -460,24 +453,24 @@ input, select, textarea {
 #header-banner h1 a:active, #header-banner h1 a:focus {
   outline: none;
 }
-/* line 27, ../src/inc/_primary.scss */
+/* line 31, ../src/inc/_primary.scss */
 #header-banner .blog-description {
   font-size: 1em;
   line-height: 3em;
   font-style: italic;
   margin-right: 1em;
   position: absolute;
-  bottom: -1.5em;
-  left: 1em;
+  bottom: -1em;
+  left: 3em;
   z-index: 0;
 }
 
-/* line 39, ../src/inc/_primary.scss */
+/* line 43, ../src/inc/_primary.scss */
 #nav-primary li {
   background: #cccccc;
   text-align: center;
 }
-/* line 43, ../src/inc/_primary.scss */
+/* line 47, ../src/inc/_primary.scss */
 #nav-primary a {
   color: #1a1a1a;
   display: block;
@@ -488,29 +481,29 @@ input, select, textarea {
 #nav-primary a:hover {
   color: #e6e6e6;
 }
-/* line 48, ../src/inc/_primary.scss */
+/* line 52, ../src/inc/_primary.scss */
 #nav-primary a:hover {
   background: gray;
 }
 
-/* line 54, ../src/inc/_primary.scss */
+/* line 58, ../src/inc/_primary.scss */
 .js #nav-primary > ul {
   display: none;
 }
 
-/* line 55, ../src/inc/_primary.scss */
+/* line 59, ../src/inc/_primary.scss */
 .js .tinynav {
   display: block;
 }
 
-/* line 57, ../src/inc/_primary.scss */
+/* line 61, ../src/inc/_primary.scss */
 .sidebar > ul {
   list-style: none;
   margin: 0;
   padding: 0;
 }
 
-/* line 63, ../src/inc/_primary.scss */
+/* line 67, ../src/inc/_primary.scss */
 .widget {
   margin-top: 0em;
   padding-top: 0em;
@@ -518,7 +511,7 @@ input, select, textarea {
   margin-bottom: 1.5em;
 }
 
-/* line 68, ../src/inc/_primary.scss */
+/* line 72, ../src/inc/_primary.scss */
 .widget_search label {
   display: none;
 }

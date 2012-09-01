@@ -10,7 +10,7 @@
 
 body {
 	@include establish-baseline;
-	@include baseline-grid-background( $base-line-height );
+	//@include baseline-grid-background( $base-line-height );
 }
 
 h1 {

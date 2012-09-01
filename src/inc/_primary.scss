@@ -17,6 +17,10 @@ input, select, textarea {
 		position: relative;
 	}
 	h1 {
+		$f: $base-font-size * 3.00;
+		@include adjust-font-size-to( $f );
+		@include rhythm( 0, 0, 0, 1, $f );
+		position: relative;
 		z-index: 1;
 		a {
 			@include unstyled-link;
@@ -29,8 +33,8 @@ input, select, textarea {
 		font-style: italic;
 		margin-right: 1em;
 		position: absolute;
-			bottom: -1.5em;
-			left: 1em;
+			bottom: -1.0em;
+			left: 3em;
 		z-index: 0;
 	}
 }
