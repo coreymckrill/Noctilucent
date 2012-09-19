@@ -64,7 +64,7 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 		
 		// Modernizr
 		$modernizr_version = '2.6.1';
-		wp_register_script( 'modernizr', get_stylesheet_directory_uri() . '/js/modernizr-' . $modernizr_version . '.min.js', array(), $modernizr_version );
+		wp_register_script( 'modernizr', get_template_directory_uri() . '/js/modernizr-' . $modernizr_version . '.min.js', array(), $modernizr_version );
 		wp_enqueue_script( 'modernizr' );
 		
 		// Comment reply functions
@@ -86,6 +86,29 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 
     }
     add_action( 'wp_enqueue_scripts', 'noctilucent_enqueue_scripts' );
+}
+
+
+/**
+ * Theme setup wrapper to allow child themes to change/remove actions and filters
+ */
+if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
+	function noctilucent_theme_setup() {
+		
+		// Modify contents of title tag
+		add_filter( 'wp_title', 'noctilucent_title_tag', 10, 3 );
+		
+		// Body classes
+		add_filter( 'body_class', 'noctilucent_body_classes' );
+		
+		// Insert primary nav after header
+		add_action( 'noctilucent_after_header', 'noctilucent_insert_primary_nav' );
+		
+		// Unsuck gallery styling
+		add_filter( 'gallery_style', 'noctilucent_edit_gallery_style' );
+		
+	}
+	add_action( 'after_setup_theme', 'noctilucent_theme_setup', 10 );
 }
 
 
@@ -220,8 +243,8 @@ if ( ! function_exists( 'noctilucent_body_classes' ) ) {
 		}
         return $classes;
     }
-    add_filter( 'body_class', 'noctilucent_body_classes' );
 }
+
 
 /**
  * Content width
@@ -232,6 +255,7 @@ if ( ! function_exists( 'noctilucent_body_classes' ) ) {
  */
 if ( ! isset( $content_width ) )
 	$content_width = 640;
+
 
 /**
  * Custom author link
@@ -371,6 +395,7 @@ if ( ! function_exists( 'noctilucent_page_menu' ) ) {
 	}
 }
 
+
 /**
  * Pare down the inline gallery CSS to allow for more flexibility in the
  * stylesheets
@@ -392,8 +417,8 @@ if ( ! function_exists( 'noctilucent_edit_gallery_style' ) ) {
 		$output .= '<div' . $div[1];
 		echo $output;
 	}
-	add_filter( 'gallery_style', 'noctilucent_edit_gallery_style' );
 }
+
 
 /**
  * Generate section header based on the type of archive page
@@ -429,10 +454,11 @@ if ( ! function_exists( 'noctilucent_section_header' ) ) {
 	}
 }
 
+
 /**
 * Returns true if a blog has more than 1 category
 *
-* From https://github.com/Automattic/_s/blob/master/inc/template-tags.php
+* From https://github.com/Automattic/_s/
 */
 if ( ! function_exists( 'noctilucent_categorized_blog' ) ) {
 	function noctilucent_categorized_blog() {
@@ -457,6 +483,7 @@ if ( ! function_exists( 'noctilucent_categorized_blog' ) ) {
 		}
 	}
 }
+
 
 /**
  * Filter the title tag to add site info
@@ -486,5 +513,36 @@ if ( ! function_exists( 'noctilucent_title_tag' ) ) {
 		return $output;
 	
 	}
-	add_filter( 'wp_title', 'noctilucent_title_tag', 10, 3 );
+}
+
+
+/**
+ * Nav function wrapper
+ */
+if ( ! function_exists( 'noctilucent_insert_primary_nav' ) ) {
+	function noctilucent_insert_primary_nav() {
+		wp_nav_menu( array(
+			'container'         => 'nav',
+			'container_id'      => 'nav-primary',
+			'theme_location'    => 'primary',
+			'fallback_cb'       => 'noctilucent_page_menu'
+		) );
+	}
+}
+
+
+/**
+ * Add nextpage button to TinyMCE
+ */
+if ( ! function_exists( 'noctilucent_tinymce_nextpage' ) ) {
+	function noctilucent_tinymce_nextpage( $mce_buttons ) {
+		$pos = array_search( 'wp_more', $mce_buttons, true );
+		if ( $pos !== false ) {
+			$tmp_buttons = array_slice( $mce_buttons, 0, $pos + 1 );
+			$tmp_buttons[] = 'wp_page';
+			$mce_buttons = array_merge( $tmp_buttons, array_slice( $mce_buttons, $pos + 1 ) );
+		}
+		return $mce_buttons; 
+	}
+	add_filter( 'mce_buttons', 'noctilucent_tinymce_nextpage' );
 }

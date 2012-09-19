@@ -31,20 +31,16 @@
 	<p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
 	<![endif]-->
 
+	<?php do_action( 'noctilucent_before_header' ); ?>
+
 	<header id="header-banner" role="banner">
 		<hgroup>
 			<h1><a href="<?php echo home_url(); ?>/"><?php bloginfo( 'name' ); ?></a></h1>
 			<p class="blog-description"><?php bloginfo( 'description' ); ?></p>
 		</hgroup>
+		<?php do_action( 'noctilucent_append_to_header' ); ?>
 	</header>
 	
-	<?php
-	wp_nav_menu( array(
-		'container'         => 'nav',
-		'container_id'      => 'nav-primary',
-		'theme_location'    => 'primary',
-		'fallback_cb'       => 'noctilucent_page_menu'
-	) );
-	?>
+	<?php do_action( 'noctilucent_after_header' ); ?>
 	
     <div id="main" role="main">
