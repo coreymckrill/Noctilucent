@@ -1,5 +1,5 @@
                 <article>
-                    <header>
+                    <header class="post-header">
                         <h1>Nothing to see here.</h1>
                     </header>
                     <p>There isn't any content here yet.</p>
