@@ -30,6 +30,9 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
 			// Remove meta boxes from built-in post types
             //add_action( 'admin_menu', array( &$this, 'remove_builtin_meta_boxes' ) );
 			
+			// Set visual editor's image link default to none
+			add_action( 'admin_init', array( &$this, 'imglink_default' ), 10 );
+			
 			// Suppress update notifications for non-admins
 			if ( ! current_user_can( 'update_plugins' ) ) {
 				add_action( 'init', create_function( '$a', "remove_action( 'init', 'wp_version_check' );" ), 2 );
@@ -102,6 +105,15 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
             //remove_meta_box( 'commentsdiv', 'page', 'normal' );
             //remove_meta_box( 'authordiv', 'page', 'normal' );
         } // End function remove_builtin_meta_boxes
+		
+		// Set image link default to none
+		// http://andrewnorcross.com/tutorials/functions-file/stop-hyperlinking-images/
+		function imglink_default() {
+			$image_set = get_site_option( 'image_default_link_type' );
+			if ( $image_set !== 'none' ) {
+				update_site_option( 'image_default_link_type', 'none' );
+			}
+		}
 		
     } // End class Noctilucent_Admin
     
