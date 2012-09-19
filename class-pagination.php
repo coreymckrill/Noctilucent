@@ -105,9 +105,9 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
 					
 				// Left navigation items
                 if ( $this->paged > 2 && $this->paged > $range + 1 && $showitems < $pages )
-                    $nav .= $this->pagination_link( 1 ) . "\" class=\"pagination-first\">" . esc_html( $link_first ) . "</a>";
+                    $nav .= $this->pagination_link( 1 ) . "\" class=\"pagination-nav pagination-first\">" . esc_html( $link_first ) . "</a>";
                 if ( $this->paged > 1 )
-                    $nav .= $this->pagination_link( $this->paged - 1 ) . "\" class=\"pagination-prev\">" . esc_html( $link_prev ) . "</a>";
+                    $nav .= $this->pagination_link( $this->paged - 1 ) . "\" class=\"pagination-nav pagination-prev\">" . esc_html( $link_prev ) . "</a>";
                 
 				// Specific page numbers
                 for ( $i = 1; $i <= $pages; $i++ ) {
@@ -118,9 +118,9 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
                 
 				// Right navigation items
                 if ( $this->paged < $pages )
-                    $nav .= $this->pagination_link( $this->paged + 1 ) . "\" class=\"pagination-next\">" . esc_html( $link_next ) . "</a>";
+                    $nav .= $this->pagination_link( $this->paged + 1 ) . "\" class=\"pagination-nav pagination-next\">" . esc_html( $link_next ) . "</a>";
                 if ( $this->paged < $pages - 1 && $this->paged + $range - 1 < $pages && $showitems < $pages )
-                    $nav .= $this->pagination_link( $pages ) . "\" class=\"pagination-last\">" . esc_html( $link_last ) . "</a>";
+                    $nav .= $this->pagination_link( $pages ) . "\" class=\"pagination-nav pagination-last\">" . esc_html( $link_last ) . "</a>";
                 
 				// Close container element
 				if ( $container )
