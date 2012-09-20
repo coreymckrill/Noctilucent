@@ -329,21 +329,23 @@ if ( ! function_exists( 'noctilucent_comments' ) ) {
  * Added arguments:
  * - container
  * - container_id
+ * - container_class
  */
 if ( ! function_exists( 'noctilucent_page_menu' ) ) {
 	function noctilucent_page_menu( $args = array() ) {
 			$defaults = array(
-				'sort_column' => 'menu_order, post_title',
-				'menu_class' => 'menu',
-				'echo' => true,
-				'link_before' => '',
-				'link_after' => '',
-				'container' => 'nav',
-				'container_id' => 'nav-primary'
+				'sort_column'     => 'menu_order, post_title',
+				'menu_class'      => 'menu',
+				'echo'            => true,
+				'link_before'     => '',
+				'link_after'      => '',
+				'container'       => 'div',
+				'container_id'    => '',
+				'container_class' => ''
 			);
 			$args = wp_parse_args( $args, $defaults );
 			$args = apply_filters( 'wp_page_menu_args', $args );
-	
+			
 			$menu = '';
 	
 			$list_args = $args;
@@ -372,20 +374,28 @@ if ( ! function_exists( 'noctilucent_page_menu' ) ) {
 			$list_args['echo'] = false;
 			$list_args['title_li'] = '';
 			$menu .= str_replace( array( "\r", "\n", "\t" ), '', wp_list_pages($list_args) );
-	
+			
+			$menu_class = '';
+			if ( $args['menu_class'] )
+				$menu_class = ' class="' . esc_attr( $args['menu_class'] ) . '"';
+			
 			if ( $menu )
-				$menu = '<ul>' . $menu . '</ul>';
+				$menu = "<ul{$menu_class}>{$menu}</ul>";
 	
 			$container = '';
-			if ( $list_args['container'] )
-				$container = ( $list_args['container'] == 'div' ) ? 'div' : 'nav';
+			if ( $args['container'] )
+				$container = ( $args['container'] == 'nav' ) ? 'nav' : 'div';
 			
 			$container_id = '';
-			if ( $list_args['container_id'] )
-				$container_id = ' id="' . esc_attr( $list_args['container_id'] ) . '"';
+			if ( $args['container_id'] )
+				$container_id = ' id="' . esc_attr( $args['container_id'] ) . '"';
+				
+			$container_class = '';
+			if ( $args['container_class'] )
+				$container_class = ' class="' . esc_attr( $args['container_class'] ) . '"';
 	
-			if ( $container )
-				$menu = '<' . $container . $container_id . ' class="' . esc_attr($args['menu_class']) . '">' . $menu . "</" . $container . ">\n";
+			if ( $container && $menu )
+				$menu = "<{$container}{$container_id}{$container_class}>{$menu}</{$container}>\n";
 			
 			$menu = apply_filters( 'wp_page_menu', $menu, $args );
 			if ( $args['echo'] )
