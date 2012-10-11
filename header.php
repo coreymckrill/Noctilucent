@@ -34,6 +34,7 @@
 	<?php do_action( 'noctilucent_before_header' ); ?>
 
 	<header id="header-banner" role="banner">
+		<?php do_action( 'noctilucent_prepend_to_header' ); ?>
 		<hgroup>
 			<h1><a href="<?php echo home_url(); ?>/"><?php bloginfo( 'name' ); ?></a></h1>
 			<p class="blog-description"><?php bloginfo( 'description' ); ?></p>
@@ -41,6 +42,8 @@
 		<?php do_action( 'noctilucent_append_to_header' ); ?>
 	</header>
 	
-	<?php do_action( 'noctilucent_after_header' ); ?>
+	<?php do_action( 'noctilucent_after_header' );
+	   // noctilucent_insert_primary_nav
+	?>
 	
     <div id="main" role="main">

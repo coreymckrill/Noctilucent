@@ -3,18 +3,15 @@
 	<?php do_action( 'noctilucent_before_footer' ); ?>
 	
 	<footer id="footer-site">
+		<?php do_action( 'noctilucent_prepend_to_footer' ); ?>
 		<?php get_sidebar( 'footer' ); ?>
-		
-		<?php
-		$firstyear = new DateTime( '2012-01-01' );
-		( $firstyear->format( 'Y' ) == date( 'Y' ) ) ? $copyright = date( 'Y' ) : $copyright = $firstyear->format( 'Y' ) . ' &ndash; ' . date( 'Y' );
-		?>
-
-		<p>&copy; <?php echo $copyright; ?> <?php bloginfo( 'name' ); ?>. All rights reserved.</p>
-		<p>Site by <a href="http://jupiterwise.com">Jupiterwise Design</a></p>
+		<?php do_action( 'noctilucent_append_to_footer' ); ?>
 	</footer>
 	
-	<?php do_action( 'noctilucent_after_footer' ); ?>
+	<?php do_action( 'noctilucent_after_footer' );
+	   // noctilucent_insert_copyright
+	   // noctilucent_insert_credit
+	?>
 
     <?php wp_footer(); ?>
 

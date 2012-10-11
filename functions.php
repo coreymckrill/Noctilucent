@@ -42,7 +42,7 @@ if ( ! function_exists( 'noctilucent_enqueue_styles' ) ) {
 if ( ! function_exists( 'noctilucent_load_jquery' ) ) {
     function noctilucent_load_jquery() {
 		
-		$jquery_version = '1.8.0';
+		$jquery_version = '1.8.2';
 		
 		if ( ! is_admin() ) {
 			wp_deregister_script( 'jquery' );
@@ -90,37 +90,6 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 
 
 /**
- * Theme setup wrapper to allow child themes to change/remove actions and filters
- */
-if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
-	function noctilucent_theme_setup() {
-		
-		// Modify contents of title tag
-		add_filter( 'wp_title', 'noctilucent_title_tag', 10, 3 );
-		
-		// Body classes
-		add_filter( 'body_class', 'noctilucent_body_classes' );
-		
-		// Insert primary nav after header
-		add_action( 'noctilucent_after_header', 'noctilucent_insert_primary_nav' );
-		
-		// Unsuck gallery styling
-		add_filter( 'gallery_style', 'noctilucent_edit_gallery_style' );
-		
-	}
-	add_action( 'after_setup_theme', 'noctilucent_theme_setup', 10 );
-}
-
-
-/**
- * Add pingback link
- */
-function noctilucent_add_pingback() {
-    echo "<link rel='pingback' href='" . get_bloginfo( 'pingback_url' ) . "' />\n";
-}
-
-
-/**
  * Clean up <head>
  * Pluggable
  */
@@ -140,6 +109,13 @@ if ( ! function_exists( 'noctilucent_head_cleanup' ) ) {
     }
     add_action( 'init', 'noctilucent_head_cleanup' );
 }
+
+	/**
+	 * Add pingback link
+	 */
+	function noctilucent_add_pingback() {
+		echo "<link rel='pingback' href='" . get_bloginfo( 'pingback_url' ) . "' />\n";
+	}
 
 
 /**
@@ -229,24 +205,6 @@ if ( ! function_exists( 'noctilucent_sidebars' ) ) {
 
 
 /**
- * Custom body classes
- * Pluggable
- */
-if ( ! function_exists( 'noctilucent_body_classes' ) ) {
-    function noctilucent_body_classes( $classes ) {
-        if ( is_singular() )
-            $classes[] = 'singular';
-		if ( is_page() ) {
-			global $post;
-			$slug = $post->post_name;
-			$classes[] = 'page-' . $slug;
-		}
-        return $classes;
-    }
-}
-
-
-/**
  * Content width
  * Pluggable
  *
@@ -258,15 +216,177 @@ if ( ! isset( $content_width ) )
 
 
 /**
- * Custom author link
+ * Theme setup wrapper to allow child themes to change/remove actions and filters
+ */
+if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
+	function noctilucent_theme_setup() {
+		
+		// Modify contents of title tag
+		add_filter( 'wp_title', 'noctilucent_title_tag', 10, 3 );
+		
+		// Body classes
+		add_filter( 'body_class', 'noctilucent_body_classes' );
+		
+		// Insert primary nav after header
+		add_action( 'noctilucent_after_header', 'noctilucent_insert_primary_nav' );
+		
+		// Insert copyright string and credit string after footer
+		add_action( 'noctilucent_after_footer', 'noctilucent_insert_copyright' );
+		add_action( 'noctilucent_after_footer', 'noctilucent_insert_credit' );
+		
+		// Unsuck gallery styling
+		add_filter( 'gallery_style', 'noctilucent_edit_gallery_style' );
+		
+	}
+	add_action( 'after_setup_theme', 'noctilucent_theme_setup', 10 );
+}
+
+	/**
+	 * Filter the title tag to add site info
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_title_tag' ) ) {
+		function noctilucent_title_tag( $title, $sep, $seplocation ) {
+			
+			global $page, $paged;
+			$site_label = get_bloginfo( 'name' );
+			
+			$site_description = get_bloginfo( 'description', 'display' );
+			if ( $site_description && ( is_home() || is_front_page() ) )
+				$site_label .= " $sep $site_description";
+			
+			if ( ! $title )
+				return $site_label;
+			
+			if ( $seplocation == 'right' ) {
+				$output = "$title $site_label";
+			} else {
+				$output = "$site_label $title";
+			}
+			
+			if ( $paged >= 2 || $page >= 2 )
+				$output .= " $sep " . sprintf( 'Page %s', max( $paged, $page ) );
+			
+			return $output;
+		
+		}
+	}
+
+	/**
+	 * Custom body classes
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_body_classes' ) ) {
+		function noctilucent_body_classes( $classes ) {
+			if ( is_singular() )
+				$classes[] = 'singular';
+			if ( is_page() ) {
+				global $post;
+				$slug = $post->post_name;
+				$classes[] = 'page-' . $slug;
+			}
+			return $classes;
+		}
+	}
+
+	/**
+	 * Insert primary nav
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_insert_primary_nav' ) ) {
+		function noctilucent_insert_primary_nav() {
+			wp_nav_menu( array(
+				'container'         => 'nav',
+				'container_id'      => 'nav-primary',
+				'theme_location'    => 'primary',
+				'fallback_cb'       => 'noctilucent_page_menu'
+			) );
+		}
+	}
+	
+	/**
+	 * Insert copyright string
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_insert_copyright' ) ) {
+		function noctilucent_insert_copyright() { ?>
+			<p class="site-copyright">&copy; <?php echo noctilucent_copyright_date(); ?> <?php bloginfo( 'name' ); ?>. All rights reserved.</p>
+		<?php }
+	}
+	
+	/**
+	 * Insert credit string
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_insert_credit' ) ) {
+		function noctilucent_insert_credit() { ?>
+			<p class="site-credit">Site by <a href="http://jupiterwise.com">Jupiterwise Design</a>.</p>
+		<?php }
+	}
+
+	/**
+	 * Pare down the inline gallery CSS to allow for more flexibility in the
+	 * stylesheets
+	 *
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_edit_gallery_style' ) ) {
+		function noctilucent_edit_gallery_style( $input ) {
+			$match = preg_match( '/\#(.*) {\n/', $input, $selector );
+			$match = preg_match( '/float: (.*);\n/', $input, $float );
+			$match = preg_match( '/width: (.*)%;\n/', $input, $itemwidth );
+			$match = preg_match( '/\n\t\t<div(.*)$/', $input, $div );
+			$output = "
+			<style type='text/css'>
+				#{$selector[1]} .gallery-item {
+					float: {$float[1]};
+					width: {$itemwidth[1]}%;
+				}
+			</style>
+			";
+			$output .= '<div' . $div[1];
+			echo $output;
+		}
+	}
+
+
+/**
+ * Link to author archive 
  * Pluggable
  */
 if ( ! function_exists( 'noctilucent_author_link' ) ) {
     function noctilucent_author_link() {
+		
 		$current_author_url = get_author_posts_url( get_the_author_meta( 'ID' ), get_the_author_meta( 'user_nicename' ) );
 		$current_author_link = '<a href="' . $current_author_url . '" title="Posts written by ' . get_the_author_meta( 'display_name' ) . '">' . get_the_author_meta( 'display_name' ) . '</a>';
+		
 		return $current_author_link;
+	
     }
+}
+
+
+/**
+ * Generates a year or a range of years
+ * Pluggable
+ */
+if ( ! function_exists( 'noctilucent_copyright_date' ) ) {
+	function noctilucent_copyright_date( $firstyear = '', $sep = ' &ndash; ' ) {
+		
+		try {
+			$firstyear = new DateTime( $firstyear );
+		} catch ( Exception $e ) {
+			$firstyear = new DateTime();
+		}
+		
+		if ( ! is_string( $sep ) )
+			$sep = ' &ndash; ';
+		
+		( $firstyear->format( 'Y' ) == date( 'Y' ) ) ? $copyright = date( 'Y' ) : $copyright = $firstyear->format( 'Y' ) . $sep . date( 'Y' );
+		
+		return $copyright;
+		
+	}
 }
 
 
@@ -407,30 +527,6 @@ if ( ! function_exists( 'noctilucent_page_menu' ) ) {
 
 
 /**
- * Pare down the inline gallery CSS to allow for more flexibility in the
- * stylesheets
- */
-if ( ! function_exists( 'noctilucent_edit_gallery_style' ) ) {
-	function noctilucent_edit_gallery_style( $input ) {
-		$match = preg_match( '/\#(.*) {\n/', $input, $selector );
-		$match = preg_match( '/float: (.*);\n/', $input, $float );
-		$match = preg_match( '/width: (.*)%;\n/', $input, $itemwidth );
-		$match = preg_match( '/\n\t\t<div(.*)$/', $input, $div );
-		$output = "
-		<style type='text/css'>
-			#{$selector[1]} .gallery-item {
-				float: {$float[1]};
-				width: {$itemwidth[1]}%;
-			}
-		</style>
-		";
-		$output .= '<div' . $div[1];
-		echo $output;
-	}
-}
-
-
-/**
  * Generate section header based on the type of archive page
  */
 if ( ! function_exists( 'noctilucent_section_header' ) ) {
@@ -491,52 +587,6 @@ if ( ! function_exists( 'noctilucent_categorized_blog' ) ) {
 			// This blog has only 1 category so _s_categorized_blog should return false
 			return false;
 		}
-	}
-}
-
-
-/**
- * Filter the title tag to add site info
- */
-if ( ! function_exists( 'noctilucent_title_tag' ) ) {
-	function noctilucent_title_tag( $title, $sep, $seplocation ) {
-		
-		global $page, $paged;
-		$site_label = get_bloginfo( 'name' );
-		
-		$site_description = get_bloginfo( 'description', 'display' );
-		if ( $site_description && ( is_home() || is_front_page() ) )
-			$site_label .= " $sep $site_description";
-		
-		if ( ! $title )
-			return $site_label;
-		
-		if ( $seplocation == 'right' ) {
-			$output = "$title $site_label";
-		} else {
-			$output = "$site_label $title";
-		}
-		
-		if ( $paged >= 2 || $page >= 2 )
-			$output .= " $sep " . sprintf( 'Page %s', max( $paged, $page ) );
-		
-		return $output;
-	
-	}
-}
-
-
-/**
- * Nav function wrapper
- */
-if ( ! function_exists( 'noctilucent_insert_primary_nav' ) ) {
-	function noctilucent_insert_primary_nav() {
-		wp_nav_menu( array(
-			'container'         => 'nav',
-			'container_id'      => 'nav-primary',
-			'theme_location'    => 'primary',
-			'fallback_cb'       => 'noctilucent_page_menu'
-		) );
 	}
 }
 
