@@ -4,7 +4,7 @@
 $nocti_archive_title = noctilucent_section_header();
 if ( $nocti_archive_title != '' ) : ?>
 
-                <header>
+                <header class="content-header">
                     <h3><?php echo $nocti_archive_title; ?></h3>
                 </header>
 <?php endif;
@@ -13,21 +13,28 @@ if ( is_search() ) : ?>
 
                 <p><?php get_search_form(); ?></p>
 <?php endif;
+do_action( 'noctilucent_before_loop' );
 
 // The Loop
-if ( have_posts() ) : while ( have_posts() ) : the_post();
+if ( have_posts() ) :
 
-    if ( is_page() ) {
-        get_template_part( 'content', 'page' );
-    } else {
-        get_template_part( 'content', get_post_format() );
-    }
+do_action( 'noctilucent_prepend_to_content' );
+
+while ( have_posts() ) : the_post();
+	
+	get_template_part( 'content', apply_filters( 'noctilucent_content_template', get_post_format() ) );
+		// noctilucent_load_page
+		// noctilucent_load_archive
+		// noctilucent_load_cpt
 
 endwhile;
 
+do_action( 'noctilucent_append_to_content' );
+	// noctilucent_load_comments
+
 // Pagination for blog archives
 if ( ! is_singular() && 1 != noctilucent_pagination( 'count', false ) ) : ?>
-                <footer>
+                <footer class="content-footer">
                     <?php noctilucent_pagination( 'archive' ); ?>
 
                 </footer>
@@ -42,6 +49,8 @@ else :
         get_template_part( 'content', 'none' );
     }
 
-endif; ?>
+endif;
 
+do_action( 'noctilucent_after_loop' );
+?>
             </section>

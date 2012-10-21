@@ -20,6 +20,27 @@ function noctilucent_get_protocol() {
 
 
 /**
+ * Return the URL of a theme file. If overrideable, will check child theme
+ * directory first, then parent theme.
+ *
+ * from https://core.trac.wordpress.org/attachment/ticket/18302/18302.9.diff
+ */
+function noctilucent_theme_url( $file = '', $overrideable = true ) { 
+	$file = ltrim( $file, '/' ); 
+	
+	if ( empty( $file ) || ( false !== strpos( $file, '..' ) ) ) { 
+		$url = get_stylesheet_directory_uri(); 
+	} elseif ( $overrideable && is_child_theme() && file_exists( trailingslashit( get_stylesheet_directory() ) . $file ) ) { 
+		$url = trailingslashit( get_stylesheet_directory_uri() ) . $file; 
+	} else { 
+		$url = trailingslashit( get_template_directory_uri() ) . $file; 
+	} 
+	
+	return apply_filters( 'theme_url', $url, $file, $overrideable ); 
+}
+	
+
+/**
  * Enqueue stylesheets
  * Pluggable
  */
@@ -27,7 +48,7 @@ if ( ! function_exists( 'noctilucent_enqueue_styles' ) ) {
     function noctilucent_enqueue_styles() {
 		
 		// Main stylesheet
-		wp_register_style( 'style', get_stylesheet_directory_uri() . '/css/style.css', array() );
+		wp_register_style( 'style', noctilucent_theme_url( 'css/style.css' ), array() );
 		wp_enqueue_style( 'style' );
 		
     }
@@ -44,6 +65,8 @@ if ( ! function_exists( 'noctilucent_load_jquery' ) ) {
 		
 		$jquery_version = '1.8.2';
 		
+		// Only load on front end. The latest jQuery version may not be compatible
+		// with WordPress admin scripts.
 		if ( ! is_admin() ) {
 			wp_deregister_script( 'jquery' );
 			wp_register_script( 'jquery', noctilucent_get_protocol() . '//ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js', array(), $jquery_version, true );
@@ -64,7 +87,7 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 		
 		// Modernizr
 		$modernizr_version = '2.6.1';
-		wp_register_script( 'modernizr', get_template_directory_uri() . '/js/modernizr-' . $modernizr_version . '.min.js', array(), $modernizr_version );
+		wp_register_script( 'modernizr', noctilucent_theme_url( 'js/modernizr-' . $modernizr_version . '.min.js' ), array(), $modernizr_version );
 		wp_enqueue_script( 'modernizr' );
 		
 		// Comment reply functions
@@ -72,7 +95,7 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 			wp_enqueue_script( 'comment-reply' );
 		
 		// Plugins
-		wp_register_script( 'plugins', get_stylesheet_directory_uri() . '/js/plugins.js', array( 'jquery' ), '', true );
+		wp_register_script( 'plugins', noctilucent_theme_url( 'js/plugins.js' ), array( 'jquery' ), '', true );
 		wp_enqueue_script( 'plugins' );
 		wp_localize_script( 'plugins', 'plugins_js_vars', array(
 			'ajax'           => admin_url( 'admin-ajax.php', noctilucent_get_protocol() . '//' ),
@@ -81,7 +104,7 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 		) );
 		
 		// Custom scripts
-		wp_register_script( 'main', get_stylesheet_directory_uri() . '/js/main.js', array( 'plugins' ), '', true );
+		wp_register_script( 'main', noctilucent_theme_url( 'js/main.js' ), array( 'plugins' ), '', true );
 		wp_enqueue_script( 'main' );
 
     }
@@ -217,6 +240,7 @@ if ( ! isset( $content_width ) )
 
 /**
  * Theme setup wrapper to allow child themes to change/remove actions and filters
+ * Pluggable
  */
 if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	function noctilucent_theme_setup() {
@@ -227,8 +251,19 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 		// Body classes
 		add_filter( 'body_class', 'noctilucent_body_classes' );
 		
+		// Chromeframe
+		add_action( 'noctilucent_before_header', 'noctilucent_chromeframe' );
+		
 		// Insert primary nav after header
 		add_action( 'noctilucent_after_header', 'noctilucent_insert_primary_nav' );
+		
+		// Conditionals for loading content templates
+		add_filter( 'noctilucent_content_template', 'noctilucent_load_page', 10, 1 );
+		add_filter( 'noctilucent_content_template', 'noctilucent_load_archive', 10, 1 );
+		add_filter( 'noctilucent_content_template', 'noctilucent_load_cpt', 15, 1 );
+		
+		// Insert comments template
+		add_action( 'noctilucent_append_to_content', 'noctilucent_load_comments' );
 		
 		// Insert copyright string and credit string after footer
 		add_action( 'noctilucent_after_footer', 'noctilucent_insert_copyright' );
@@ -290,6 +325,17 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	}
 
 	/**
+	 * Insert notice for outdated IE browsers
+	 */
+	if ( ! function_exists( 'noctilucent_chromeframe' ) ) {
+		function noctilucent_chromeframe() { ?>
+    <!--[if lt IE 7]>
+	<p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
+	<![endif]-->
+		<?php }
+	}
+
+	/**
 	 * Insert primary nav
 	 * Pluggable
 	 */
@@ -301,6 +347,61 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 				'theme_location'    => 'primary',
 				'fallback_cb'       => 'noctilucent_page_menu'
 			) );
+		}
+	}
+	
+	/**
+	 * Page content templates
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_load_page' ) ) {
+		function noctilucent_load_page( $name ) {
+			global $post;
+			if ( is_page() ) {
+				if ( locate_template( array( "content-page_{$post->post_name}.php" ) ) ) {
+					$name = 'page_' . $post->post_name;
+				} else {
+					$name = 'page';
+				}
+			}
+			return $name;
+		}
+	}
+	
+	/**
+	 * Archive content templates
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_load_archive' ) ) {
+		function noctilucent_load_archive( $name ) {
+			if ( is_archive() || is_search() ) {
+				$name = 'archive';
+			}
+			return $name;
+		}
+	}
+	
+	/**
+	 * Custom post type content templates
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_load_cpt' ) ) {
+		function noctilucent_load_cpt( $name ) {
+			if ( ! in_array( get_post_type(), array( 'post', 'page' ) ) ) {
+				$name = get_post_type();
+			}
+			return $name;
+		}
+	}
+	
+	/**
+	 * When to enable comments
+	 * Pluggable
+	 */
+	if ( ! function_exists( 'noctilucent_load_comments' ) ) {
+		function noctilucent_load_comments() {
+			if ( is_singular( 'post' ) || is_attachment() )
+				comments_template();
 		}
 	}
 	
@@ -369,6 +470,8 @@ if ( ! function_exists( 'noctilucent_author_link' ) ) {
 /**
  * Generates a year or a range of years
  * Pluggable
+ *
+ * $firstyear must be a valid date string, such as 2012-01-01
  */
 if ( ! function_exists( 'noctilucent_copyright_date' ) ) {
 	function noctilucent_copyright_date( $firstyear = '', $sep = ' &ndash; ' ) {
@@ -394,11 +497,13 @@ if ( ! function_exists( 'noctilucent_copyright_date' ) ) {
  * Custom comment markup
  * Pluggable
  */
-if ( ! function_exists( 'noctilucent_comments' ) ) {
-    function noctilucent_comments( $comment, $args, $depth ) {
+if ( ! function_exists( 'noctilucent_comment_markup' ) ) {
+    function noctilucent_comment_markup( $comment, $args, $depth ) {
 		$GLOBALS['comment'] = $comment;
 		switch( $comment->comment_type ) :
 			case '' :
+			case 'comment' :
+			default :
 	?>
 
 	<li>
@@ -450,6 +555,8 @@ if ( ! function_exists( 'noctilucent_comments' ) ) {
  * - container
  * - container_id
  * - container_class
+ *
+ * Pluggable
  */
 if ( ! function_exists( 'noctilucent_page_menu' ) ) {
 	function noctilucent_page_menu( $args = array() ) {
@@ -528,6 +635,7 @@ if ( ! function_exists( 'noctilucent_page_menu' ) ) {
 
 /**
  * Generate section header based on the type of archive page
+ * Pluggable
  */
 if ( ! function_exists( 'noctilucent_section_header' ) ) {
 	function noctilucent_section_header() {
@@ -541,28 +649,33 @@ if ( ! function_exists( 'noctilucent_section_header' ) ) {
 		} elseif ( is_tag() ) {
 			$section_header = 'Posts tagged &ldquo;' . single_tag_title( '', false ) . '&rdquo;';
 		} elseif ( is_day() ) {
-			$section_header = 'Archive for ' . get_the_time('F jS, Y');
+			$section_header = 'Archive for ' . get_the_time( 'F jS, Y' );
 		} elseif ( is_month() ) {
-			$section_header = 'Archive for ' . get_the_time('F, Y');
+			$section_header = 'Archive for ' . get_the_time( 'F, Y' );
 		} elseif ( is_year() ) {
-			$section_header = 'Archive for ' . get_the_time('Y');
+			$section_header = 'Archive for ' . get_the_time( 'Y' );
 		} elseif ( is_author() ) {
-			$curauth = get_user_by( 'slug', get_query_var('author_name') );
+			$curauth = get_user_by( 'slug', get_query_var( 'author_name' ) );
 			$section_header = 'Posts by ' . $curauth->display_name;
 		} elseif ( is_search() ) {
 			$search_count = $wp_query->found_posts;
 			$search_label = ( $search_count == 1 ) ? 'result' : 'results';
 			$section_header = $search_count . ' search ' . $search_label . ' for &ldquo;' . get_search_query() . '&rdquo;';
+		} elseif ( is_post_type_archive( noctilucent_custom_post_types() ) ) {
+			$pt = noctilucent_custom_post_types( true );
+			$type = get_post_type();
+			$section_header = $pt[$type]->labels->name;
 		}
 		
-		return $section_header;
-	
+		return apply_filters( 'noctilucent_section_header', $section_header );
+		
 	}
 }
 
 
 /**
 * Returns true if a blog has more than 1 category
+* Pluggable
 *
 * From https://github.com/Automattic/_s/
 */
@@ -592,7 +705,35 @@ if ( ! function_exists( 'noctilucent_categorized_blog' ) ) {
 
 
 /**
+ * Returns an array of custom post type names. If $obj is set to true, returns
+ * an associative array of objects.
+ *
+ * Pluggable
+ */
+if ( ! function_exists( 'noctilucent_custom_post_types' ) ) {
+	function noctilucent_custom_post_types( $obj = false ) {
+		
+		$args = array(
+			'public'   => true,
+			'_builtin' => false
+		);
+		$output = 'objects';
+		$operator = 'and';
+		
+		$post_types = get_post_types( $args, $output, $operator );
+		
+		if ( ! $obj )
+			$post_types = array_keys( $post_types );
+		
+		return $post_types;
+		
+	}
+}
+
+
+/**
  * Add nextpage button to TinyMCE
+ * Pluggable
  */
 if ( ! function_exists( 'noctilucent_tinymce_nextpage' ) ) {
 	function noctilucent_tinymce_nextpage( $mce_buttons ) {

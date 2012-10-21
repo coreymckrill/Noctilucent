@@ -22,7 +22,7 @@ endif; ?>
 <?php if ( get_option( 'page_comments' ) ) :
 global $cpage; if ( $cpage == '' ) $cpage = 1;
 $nocti_listcounter = ( $cpage - 1 ) * get_option( 'comments_per_page' ); ?>
-                <style>
+                <style type="text/css">
                 #commentlist { list-style-type: none; counter-reset: item <?php echo $nocti_listcounter; ?>; position: relative; }
                 #commentlist > li { counter-increment: item; }
                 #commentlist > li:before { content: counter(item) ". "; position: absolute; left: 0; }
@@ -33,7 +33,7 @@ $nocti_listcounter = ( $cpage - 1 ) * get_option( 'comments_per_page' ); ?>
                 <ol id="commentlist">
                     <?php wp_list_comments( array(
                         'type' => 'comment',
-                        'callback' => 'noctilucent_comments'
+                        'callback' => 'noctilucent_comment_markup'
                     ) ); ?>
                 </ol>
     <?php if ( get_option( 'page_comments' ) && get_comment_pages_count() > 1 ) : ?>

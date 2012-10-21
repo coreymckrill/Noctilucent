@@ -27,11 +27,10 @@
 </head>
 
 <body <?php body_class(); ?>>
-    <!--[if lt IE 7]>
-	<p class="chromeframe">You are using an outdated browser. <a href="http://browsehappy.com/">Upgrade your browser today</a> or <a href="http://www.google.com/chromeframe/?redirect=true">install Google Chrome Frame</a> to better experience this site.</p>
-	<![endif]-->
 
-	<?php do_action( 'noctilucent_before_header' ); ?>
+	<?php do_action( 'noctilucent_before_header' );
+		// noctilucent_chromeframe
+	?>
 
 	<header id="header-banner" role="banner">
 		<?php do_action( 'noctilucent_prepend_to_header' ); ?>

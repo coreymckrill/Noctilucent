@@ -1,7 +1,10 @@
 <?php get_header(); ?>
 
-<?php get_template_part( 'loop', 'index' ); ?>
+<?php get_template_part( 'loop', apply_filters( 'noctilucent_loop_template', 'index' ) ); ?>
 
-<?php get_sidebar(); ?>
+<?php
+if( apply_filters( 'noctilucent_sidebar_switch', true ) )
+	get_sidebar( apply_filters( 'noctilucent_sidebar_template', null ) );
+?>
 
 <?php get_footer(); ?>
