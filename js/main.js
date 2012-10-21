@@ -9,8 +9,7 @@ jQuery(document).ready(function($){
 		.removeAttr('width')
 	;
 	
-	// Turn primary nav into dropdown on small screens
-	// Uses tinynav.js script in plugins.js
-	$("#nav-primary > ul").tinyNav({header:true});
+	// Open external links in a new window
+	$('.external-link').attr('target','_blank');
 	
 });
