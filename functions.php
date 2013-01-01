@@ -4,6 +4,7 @@
  * Includes
  */
 get_template_part( 'class', 'pagination' );
+get_template_part( 'class', 'homepage' );
 get_template_part( 'class', 'breadcrumbs' );
 if ( is_admin() ) {
     get_template_part( 'class', 'admin' );
@@ -63,7 +64,7 @@ if ( ! function_exists( 'noctilucent_enqueue_styles' ) ) {
 if ( ! function_exists( 'noctilucent_load_jquery' ) ) {
     function noctilucent_load_jquery() {
 		
-		$jquery_version = '1.8.2';
+		$jquery_version = '1.8.3';
 		
 		// Only load on front end. The latest jQuery version may not be compatible
 		// with WordPress admin scripts.
@@ -97,10 +98,11 @@ if ( ! function_exists( 'noctilucent_enqueue_scripts' ) ) {
 		// Plugins
 		wp_register_script( 'plugins', noctilucent_theme_url( 'js/plugins.js' ), array( 'jquery' ), '', true );
 		wp_enqueue_script( 'plugins' );
-		wp_localize_script( 'plugins', 'plugins_js_vars', array(
+		wp_localize_script( 'plugins', 'noctilucentVars', array(
 			'ajax'           => admin_url( 'admin-ajax.php', noctilucent_get_protocol() . '//' ),
 			'home_url'       => home_url(),
-			'jquery'         => home_url() . '/' . WPINC . '/js/jquery/jquery.js'
+			'jquery'         => home_url() . '/' . WPINC . '/js/jquery/jquery.js',
+			'stylesheet'     => get_stylesheet_directory_uri()
 		) );
 		
 		// Custom scripts
@@ -543,7 +545,7 @@ if ( ! function_exists( 'noctilucent_comment_markup' ) ) {
 	<?php
 				break;
 		endswitch;
-    // </li> is added by wordpress automatically
+    // </li> is added by WordPress automatically
     }
 }
 
@@ -675,33 +677,42 @@ if ( ! function_exists( 'noctilucent_section_header' ) ) {
 
 /**
 * Returns true if a blog has more than 1 category
-* Pluggable
 *
 * From https://github.com/Automattic/_s/
 */
-if ( ! function_exists( 'noctilucent_categorized_blog' ) ) {
-	function noctilucent_categorized_blog() {
-		if ( false === ( $all_the_cool_cats = get_transient( 'all_the_cool_cats' ) ) ) {
-			// Create an array of all the categories that are attached to posts
-			$all_the_cool_cats = get_categories( array(
-				'hide_empty' => 1,
-			) );
-			
-			// Count the number of categories that are attached to the posts
-			$all_the_cool_cats = count( $all_the_cool_cats );
-			
-			set_transient( 'all_the_cool_cats', $all_the_cool_cats );
-		}
+function noctilucent_categorized_blog() {
+	if ( false === ( $all_the_cool_cats = get_transient( 'all_the_cool_cats' ) ) ) {
+		// Create an array of all the categories that are attached to posts
+		$all_the_cool_cats = get_categories( array(
+			'hide_empty' => 1,
+		) );
 		
-		if ( '1' != $all_the_cool_cats ) {
-			// This blog has more than 1 category so _s_categorized_blog should return true
-			return true;
-		} else {
-			// This blog has only 1 category so _s_categorized_blog should return false
-			return false;
-		}
+		// Count the number of categories that are attached to the posts
+		$all_the_cool_cats = count( $all_the_cool_cats );
+		
+		set_transient( 'all_the_cool_cats', $all_the_cool_cats );
+	}
+	
+	if ( '1' != $all_the_cool_cats ) {
+		// This blog has more than 1 category so _s_categorized_blog should return true
+		return true;
+	} else {
+		// This blog has only 1 category so _s_categorized_blog should return false
+		return false;
 	}
 }
+
+/**
+* Flush out the transients used in noctilucent_categorized_blog
+*
+* From https://github.com/Automattic/_s/
+*/
+function noctilucent_category_transient_flusher() {
+	// Like, beat it. Dig?
+	delete_transient( 'all_the_cool_cats' );
+}
+add_action( 'edit_category', 'noctilucent_category_transient_flusher' );
+add_action( 'save_post', 'noctilucent_category_transient_flusher' );
 
 
 /**
