@@ -23,7 +23,7 @@
 						if ( has_category() || has_tag() ) : ?>
 						<p class="post-meta">
 							<?php if ( has_category() && noctilucent_categorized_blog() ) : ?>
-							<span class="post-categories">Categories: <?php the_category( ', ' ); ?></span>
+							<span class="post-categories"><?php echo ( count( get_the_category() ) == 1 ) ? 'Category' : 'Categories'; ?>: <?php the_category( ', ' ); ?></span>
 							<?php endif; ?>
 							<?php if ( has_tag() ) : ?>
 							<span class="post-tags"><?php the_tags(); ?></span>
