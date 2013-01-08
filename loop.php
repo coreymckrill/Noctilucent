@@ -1,19 +1,8 @@
             <section class="content">
 <?php
-// Section header for archive pages
-$nocti_archive_title = noctilucent_section_header();
-if ( $nocti_archive_title != '' ) : ?>
-
-                <header class="content-header">
-                    <h3><?php echo $nocti_archive_title; ?></h3>
-                </header>
-<?php endif;
-
-if ( is_search() ) : ?>
-
-                <p><?php get_search_form(); ?></p>
-<?php endif;
 do_action( 'noctilucent_before_loop' );
+	// noctilucent_insert_section_header
+	// noctilucent_insert_search_header
 
 // The Loop
 if ( have_posts() ) :
@@ -31,14 +20,7 @@ endwhile;
 
 do_action( 'noctilucent_append_to_content' );
 	// noctilucent_load_comments
-
-// Pagination for blog archives
-if ( ! is_singular() && 1 != noctilucent_pagination( 'count', false ) ) : ?>
-                <footer class="content-footer">
-                    <?php noctilucent_pagination( 'archive' ); ?>
-
-                </footer>
-<?php endif;
+	// noctilucent_insert_archive_pagination
 
 // No posts
 else :

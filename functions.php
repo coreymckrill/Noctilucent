@@ -42,10 +42,10 @@ function noctilucent_get_protocol() {
  *
  * from https://core.trac.wordpress.org/attachment/ticket/18302/18302.9.diff
  */
-function noctilucent_theme_url( $file = '', $overrideable = true ) { 
+function noctilucent_theme_url( $file = '', $overrideable = true ) {
 	$file = ltrim( $file, '/' ); 
 	
-	if ( empty( $file ) || ( false !== strpos( $file, '..' ) ) ) { 
+	if ( empty( $file ) || ( false !== strpos( $file, '..' ) ) ) {
 		$url = get_stylesheet_directory_uri(); 
 	} elseif ( $overrideable && is_child_theme() && file_exists( trailingslashit( get_stylesheet_directory() ) . $file ) ) { 
 		$url = trailingslashit( get_stylesheet_directory_uri() ) . $file; 
@@ -274,14 +274,19 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 		
 		// Insert primary nav after header
 		add_action( 'noctilucent_after_header', 'noctilucent_insert_primary_nav' );
-		
+
+		// Pre-content insertions
+		add_action( 'noctilucent_before_loop', 'noctilucent_insert_section_header' );
+		add_action( 'noctilucent_before_loop', 'noctilucent_insert_search_header' );
+
 		// Conditionals for loading content templates
 		add_filter( 'noctilucent_content_template', 'noctilucent_load_page', 10, 1 );
 		add_filter( 'noctilucent_content_template', 'noctilucent_load_archive', 10, 1 );
 		add_filter( 'noctilucent_content_template', 'noctilucent_load_cpt', 15, 1 );
-		
-		// Insert comments template
+
+		// Post-content insertions
 		add_action( 'noctilucent_append_to_content', 'noctilucent_load_comments' );
+		add_action( 'noctilucent_append_to_content', 'noctilucent_insert_archive_pagination' );
 		
 		// Insert copyright string and credit string after footer
 		add_action( 'noctilucent_after_footer', 'noctilucent_insert_copyright' );
@@ -367,7 +372,55 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 			) );
 		}
 	}
-	
+
+	/**
+	 * Insert section header
+	 */
+	if ( ! function_exists( 'noctilucent_insert_section_header' ) ) {
+		function noctilucent_insert_section_header() {
+
+			$archive_title = noctilucent_section_header();
+
+			if ( $nocti_archive_title != '' ) : ?>
+	            <header class="content-header">
+	                <h3><?php echo $archive_title; ?></h3>
+	            </header>
+			<?php endif;
+
+		}
+	}
+
+	/**
+	 * Insert search page header
+	 */
+	if ( ! function_exists( 'noctilucent_insert_search_header' ) ) {
+		function noctilucent_insert_search_header() {
+
+			if ( is_search() ) : ?>
+                <?php get_search_form(); ?>
+			<?php endif;
+
+		}
+	}
+
+	/**
+	 * Insert archive pagination
+	 */
+	if ( ! function_exists( 'noctilucent_insert_archive_pagination' ) ) {
+		function noctilucent_insert_archive_pagination() {
+
+			if ( ! class_exists( 'Noctilucent_Pagination' ) )
+				return;
+
+			if ( ! is_singular() && 1 != noctilucent_pagination( 'count', false ) ) : ?>
+	            <footer class="content-footer">
+					<?php noctilucent_pagination( 'archive' ); ?>
+	            </footer>
+			<?php endif;
+
+		}
+	}
+
 	/**
 	 * Page content templates
 	 * Pluggable
