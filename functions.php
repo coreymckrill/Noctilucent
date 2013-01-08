@@ -1,15 +1,31 @@
 <?php
 
 /**
- * Includes
+ * Load includes
  */
-get_template_part( 'class', 'pagination' );
-get_template_part( 'class', 'homepage' );
-get_template_part( 'class', 'breadcrumbs' );
-if ( is_admin() ) {
-    get_template_part( 'class', 'admin' );
-}
+if ( ! function_exists( 'noctilucent_load_modules' ) ) {
+	function noctilucent_load_modules() {
 
+		$defaults = array(
+			'admin',
+			'breadcrumbs',
+			'homepage',
+			'pagination'
+		);
+		$modules = apply_filters( 'noctilucent_modules', $defaults );
+
+		foreach ( $modules as $module ) {
+			if ( $module == 'admin' ) {
+				if ( is_admin() )
+					get_template_part( 'inc/class', $module );
+			} else {
+				get_template_part( 'inc/class', $module );
+			}
+		}
+
+	}
+	add_action( 'after_setup_theme', 'noctilucent_load_modules', 1 );
+}
 
 /**
  * Determine HTTP protocol
@@ -246,7 +262,7 @@ if ( ! isset( $content_width ) )
  */
 if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	function noctilucent_theme_setup() {
-		
+
 		// Modify contents of title tag
 		add_filter( 'wp_title', 'noctilucent_title_tag', 10, 3 );
 		
