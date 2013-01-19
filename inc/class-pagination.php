@@ -8,14 +8,14 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
     
     class Noctilucent_Pagination {
         
-		function __construct() {
+		function __construct( $query ) {
 			
-			global $multipage, $numpages, $wp_query, $page, $paged;
+			global $multipage, $numpages;
 			$this->multipage     = $multipage;
 			$this->numpages      = $numpages;
-			$this->max_num_pages = $wp_query->max_num_pages;
-			$this->page          = $page;
-			$this->paged         = $paged;
+			$this->max_num_pages = $query->max_num_pages;
+			$this->page          = get_query_var('page');
+			$this->paged         = get_query_var('paged');
 			
 		}
 		
@@ -70,7 +70,7 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
 			if ( ! is_int( $range ) )
 				$range = $defaults['range'];
 			$showitems = ( $range * 2 ) + 1;
-            
+
 			// Get current page number
             if ( $this->multipage ) {
                 if ( $this->page ) {
@@ -79,7 +79,11 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
                     $this->paged = 1;
                 }
             } else if ( empty( $this->paged ) ) {
-                $this->paged = 1;
+	            if ( $this->page ) {
+		            $this->paged = $this->page;
+	            } else {
+		            $this->paged = 1;
+	            }
             }
 			
 			// Begin compilation
@@ -140,9 +144,12 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
 	/**
 	 * Pagination template tag
 	 */
-    function noctilucent_pagination( $context = 'single', $echo = true, $args = null ) {
-        
-		$p = new Noctilucent_Pagination();
+    function noctilucent_pagination( $context = 'single', $echo = true, $args = null, $query = null ) {
+
+	    if ( ! $query )
+		    $query = $GLOBALS['wp_query'];
+
+		$p = new Noctilucent_Pagination( $query );
 		
         if ( $context == 'single' && is_singular() ) {
             if ( $echo == true ) {
@@ -156,6 +163,12 @@ if ( ! class_exists( 'Noctilucent_Pagination' ) ) {
             } else {
                 return $p->pagination( $args );
             }
+        } else if ( $context == 'custom' ) {
+	        if ( $echo == true ) {
+		        echo $p->pagination( $args );
+	        } else {
+		        return $p->pagination( $args );
+	        }
         } else if ( $context == 'count' ) {
             if ( $echo == true ) {
                 echo $p->count_pages();
