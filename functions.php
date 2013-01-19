@@ -80,13 +80,13 @@ if ( ! function_exists( 'noctilucent_enqueue_styles' ) ) {
 if ( ! function_exists( 'noctilucent_load_jquery' ) ) {
     function noctilucent_load_jquery() {
 		
-		$jquery_version = '1.8.3';
+		$jquery_version = apply_filters( 'noctilucent_jquery_version', '1.8.3' );
 		
 		// Only load on front end. The latest jQuery version may not be compatible
 		// with WordPress admin scripts.
 		if ( ! is_admin() ) {
 			wp_deregister_script( 'jquery' );
-			wp_register_script( 'jquery', noctilucent_get_protocol() . '//ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js', array(), $jquery_version, true );
+			wp_register_script( 'jquery', noctilucent_get_protocol() . '//ajax.googleapis.com/ajax/libs/jquery/' . $jquery_version . '/jquery.min.js', array(), $jquery_version, apply_filters( 'noctilucent_jquery_in_footer', true ) );
 			wp_enqueue_script( 'jquery' );
 		}
 		
@@ -381,7 +381,7 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 
 			$archive_title = noctilucent_section_header();
 
-			if ( $nocti_archive_title != '' ) : ?>
+			if ( $archive_title != '' ) : ?>
 	            <header class="content-header">
 	                <h3><?php echo $archive_title; ?></h3>
 	            </header>
