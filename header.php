@@ -6,22 +6,16 @@
 <head>
     
 	<meta charset="<?php bloginfo( 'charset' ); ?>" />
-	
-    <link rel="dns-prefetch" href="<?php echo noctilucent_get_protocol(); ?>//ajax.googleapis.com" />
-	
-    <?php // Use the .htaccess and remove these lines to avoid edge case issues.
-          // More info: h5bp.com/i/378 ?>
-
-    <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	
     <?php // Place favicon.ico and apple-touch-icon.png in the root directory: mathiasbynens.be/notes/touch-icons ?>
     
     <title><?php wp_title( '|', true, 'right' ); ?></title>
     <meta name="description" content="<?php bloginfo( 'description' ); ?>" />
-    
     <meta name="viewport" content="width=device-width" />
     <!--[if IE]><meta http-equiv="imagetoolbar" content="false" /><![endif]-->
-    
+
+	<link rel="dns-prefetch" href="<?php echo noctilucent_get_protocol(); ?>//ajax.googleapis.com" />
     <?php wp_head(); ?>
 
 </head>
