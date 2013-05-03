@@ -9,11 +9,13 @@
 							<?php edit_post_link( 'Edit', ' | ', ''); ?>
 						</p>
                     </header>
-                    <?php if ( is_search() ) {
-						the_excerpt();
-					} else {
-						the_content( 'Continue reading &ldquo;' . the_title( '', '', false ) . '&rdquo; &raquo;' );
-					} ?>
+	                <div class="post-content">
+	                    <?php if ( is_search() ) {
+							the_excerpt();
+						} else {
+							the_content( 'Continue reading &ldquo;' . the_title( '', '', false ) . '&rdquo; &raquo;' );
+						} ?>
+	                </div>
                     <footer class="post-footer">
                         <?php //Post pagination
                         noctilucent_pagination( 'single' );
