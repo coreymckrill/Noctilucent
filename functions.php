@@ -443,7 +443,9 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	 */
 	if ( ! function_exists( 'noctilucent_load_archive' ) ) {
 		function noctilucent_load_archive( $name ) {
-			if ( is_archive() || is_search() ) {
+			if ( is_search() && locate_template( array( 'content-search.php' ) ) ) {
+				$name = 'search';
+			} else if ( is_archive() || is_search() ) {
 				$name = 'archive';
 			}
 			return $name;
