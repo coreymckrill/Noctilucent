@@ -275,6 +275,10 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 		add_filter( 'noctilucent_content_template', 'noctilucent_load_archive', 10, 1 );
 		add_filter( 'noctilucent_content_template', 'noctilucent_load_cpt', 15, 1 );
 
+		// Excerpt filters
+		add_filter( 'excerpt_more', 'noctilucent_excerpt_more' );
+		add_filter( 'get_the_excerpt', 'noctilucent_excerpt_plus' );
+
 		// Post-content insertions
 		add_action( 'noctilucent_append_to_content', 'noctilucent_load_comments' );
 		add_action( 'noctilucent_append_to_content', 'noctilucent_insert_archive_pagination' );
@@ -455,10 +459,38 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 			if ( ! in_array( get_post_type(), array( 'post', 'page' ) ) ) {
 				$name = get_post_type();
 			}
-			return $name;
-		}
 	}
-	
+
+	/**
+	 * Custom excerpt link
+	 */
+	function noctilucent_excerpt_more( $more ) {
+
+		global $post;
+
+		$url = get_permalink( $post->ID );
+		$title = get_the_title( $post->ID );
+		$more = " &hellip; <a class=\"excerpt-link\" href=\"$url\" title=\"Continue reading &ldquo;$title&rdquo;\">Continue reading &ldquo;$title&rdquo; &raquo;</a>";
+
+		return $more;
+
+	}
+
+	/**
+	 * Add excerpt_more even when there is an excerpt
+	 */
+	function noctilucent_excerpt_plus( $excerpt ) {
+
+		global $post;
+
+		if ( $post->post_excerpt ) {
+			$url = get_permalink( $post->ID );
+			$excerpt .= apply_filters( 'excerpt_more', '' );
+		}
+		return $excerpt;
+
+	}
+
 	/**
 	 * When to enable comments
 	 * Pluggable
