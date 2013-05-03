@@ -458,9 +458,17 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	 */
 	if ( ! function_exists( 'noctilucent_load_cpt' ) ) {
 		function noctilucent_load_cpt( $name ) {
-			if ( ! in_array( get_post_type(), array( 'post', 'page' ) ) ) {
-				$name = get_post_type();
-			}
+			$post_type = get_post_type();
+
+			if ( ! in_array( $post_type, noctilucent_custom_post_types() ) )
+				return $name;
+
+			$name = $post_type;
+			if ( is_post_type_archive( $post_type ) )
+				$name .= '_archive';
+
+			return $name;
+		}
 	}
 
 	/**
