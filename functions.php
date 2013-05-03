@@ -8,7 +8,6 @@ if ( ! function_exists( 'noctilucent_load_modules' ) ) {
 
 		$defaults = array(
 			'admin',
-			'breadcrumbs',
 			'homepage',
 			'pagination'
 		);
@@ -154,26 +153,28 @@ if ( ! function_exists( 'noctilucent_head_cleanup' ) ) {
 	/**
 	 * Add pingback link
 	 */
-	function noctilucent_add_pingback() {
-		echo "<link rel='pingback' href='" . get_bloginfo( 'pingback_url' ) . "' />\n";
-	}
+	function noctilucent_add_pingback() { ?>
+		<link rel="pingback" href="<?php bloginfo( 'pingback_url' ); ?>" />
+	<?php }
 
 
 /**
  * Disable RSS Feeds
  * Pluggable
- * 
+ *
+ * To disable a feed:
+ * add_action( 'do_feed', 'noctilucent_disable_feed', 1 );
+ * add_action( 'do_feed_rdf', 'noctilucent_disable_feed', 1 );
+ * add_action( 'do_feed_rss', 'noctilucent_disable_feed', 1 );
+ * add_action( 'do_feed_rss2', 'noctilucent_disable_feed', 1 );
+ * add_action( 'do_feed_atom', 'noctilucent_disable_feed', 1 );
+ *
  * From https://github.com/wycks/WP-Skeleton-Theme/
  */
 if ( ! function_exists( 'noctilucent_disable_feed' ) ) {
 	function noctilucent_disable_feed() {
 		wp_die( 'No feed available, please visit our <a href="' . home_url() . '">home page</a>.' );
 	}
-	//add_action( 'do_feed', 'noctilucent_disable_feed', 1 );
-	//add_action( 'do_feed_rdf', 'noctilucent_disable_feed', 1 );
-	//add_action( 'do_feed_rss', 'noctilucent_disable_feed', 1 );
-	//add_action( 'do_feed_rss2', 'noctilucent_disable_feed', 1 );
-	//add_action( 'do_feed_atom', 'noctilucent_disable_feed', 1 );
 }
 
 
@@ -238,10 +239,6 @@ if ( ! function_exists( 'noctilucent_sidebars' ) ) {
 
 /**
  * Content width
- * Pluggable
- *
- * $content_width is used to determine the intermediate image sizes in image_send_to_editor. The "large" image size will be set to the value of $content_width.
- * http://wordpress.stackexchange.com/questions/6499/how-to-create-a-conditional-content-width-for-a-wordpress-theme
  */
 if ( ! isset( $content_width ) )
 	$content_width = 640;
@@ -319,7 +316,7 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 			} else {
 				$output = "$site_label $title";
 			}
-			
+
 			if ( $paged >= 2 || $page >= 2 )
 				$output .= " $sep " . sprintf( 'Page %s', max( $paged, $page ) );
 			
@@ -376,15 +373,12 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	 */
 	if ( ! function_exists( 'noctilucent_insert_section_header' ) ) {
 		function noctilucent_insert_section_header() {
-
 			$archive_title = noctilucent_section_header();
-
 			if ( $archive_title != '' ) : ?>
 	            <header class="content-header">
 	                <h3><?php echo $archive_title; ?></h3>
 	            </header>
 			<?php endif;
-
 		}
 	}
 
@@ -393,11 +387,11 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	 */
 	if ( ! function_exists( 'noctilucent_insert_search_header' ) ) {
 		function noctilucent_insert_search_header() {
-
 			if ( is_search() ) : ?>
-                <?php get_search_form(); ?>
+				<header class="content-header">
+                    <?php get_search_form(); ?>
+				</header>
 			<?php endif;
-
 		}
 	}
 
@@ -511,7 +505,7 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 				comments_template();
 		}
 	}
-	
+
 	/**
 	 * Insert default sidebar
 	 */
@@ -545,6 +539,8 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 	/**
 	 * Pare down the inline gallery CSS to allow for more flexibility in the
 	 * stylesheets
+	 *
+	 * Note: this may not work well with Jetpack
 	 *
 	 * Pluggable
 	 */
@@ -633,7 +629,6 @@ if ( ! function_exists( 'noctilucent_comment_markup' ) ) {
 			</header>
 			
 			<?php if ( $comment->comment_approved == '0' ) : ?>
-		
 			<p class="comment-moderation">Your comment is awaiting moderation.</p>
 			<?php endif; ?>
 		
@@ -641,11 +636,11 @@ if ( ! function_exists( 'noctilucent_comment_markup' ) ) {
 		
 			<footer>
 				<?php comment_reply_link( array_merge( $args, array('depth' => $depth, 'max_depth' => $args['max_depth'] ) ) ); ?>
-		
 			</footer>
 	    </article>
     <?php
 				break;
+
 			case 'pingback' :
 			case 'trackback' : 
 	?>
@@ -677,75 +672,75 @@ if ( ! function_exists( 'noctilucent_comment_markup' ) ) {
  */
 if ( ! function_exists( 'noctilucent_page_menu' ) ) {
 	function noctilucent_page_menu( $args = array() ) {
-			$defaults = array(
-				'sort_column'     => 'menu_order, post_title',
-				'menu_class'      => 'menu',
-				'echo'            => true,
-				'link_before'     => '',
-				'link_after'      => '',
-				'container'       => 'div',
-				'container_id'    => '',
-				'container_class' => ''
-			);
-			$args = wp_parse_args( $args, $defaults );
-			$args = apply_filters( 'wp_page_menu_args', $args );
-			
-			$menu = '';
-	
-			$list_args = $args;
-	
-			// Show Home in the menu
-			if ( ! empty($args['show_home']) ) {
-					if ( true === $args['show_home'] || '1' === $args['show_home'] || 1 === $args['show_home'] )
-							$text = __('Home');
-					else
-							$text = $args['show_home'];
-					$class = '';
-					if ( is_front_page() && !is_paged() )
-							$class = 'class="current_page_item"';
-					$menu .= '<li ' . $class . '><a href="' . home_url( '/' ) . '" title="' . esc_attr($text) . '">' . $args['link_before'] . $text . $args['link_after'] . '</a></li>';
-					// If the front page is a page, add it to the exclude list
-					if (get_option('show_on_front') == 'page') {
-							if ( !empty( $list_args['exclude'] ) ) {
-									$list_args['exclude'] .= ',';
-							} else {
-									$list_args['exclude'] = '';
-							}
-							$list_args['exclude'] .= get_option('page_on_front');
-					}
-			}
-	
-			$list_args['echo'] = false;
-			$list_args['title_li'] = '';
-			$menu .= str_replace( array( "\r", "\n", "\t" ), '', wp_list_pages($list_args) );
-			
-			$menu_class = '';
-			if ( $args['menu_class'] )
-				$menu_class = ' class="' . esc_attr( $args['menu_class'] ) . '"';
-			
-			if ( $menu )
-				$menu = "<ul{$menu_class}>{$menu}</ul>";
-	
-			$container = '';
-			if ( $args['container'] )
-				$container = ( $args['container'] == 'nav' ) ? 'nav' : 'div';
-			
-			$container_id = '';
-			if ( $args['container_id'] )
-				$container_id = ' id="' . esc_attr( $args['container_id'] ) . '"';
-				
-			$container_class = '';
-			if ( $args['container_class'] )
-				$container_class = ' class="' . esc_attr( $args['container_class'] ) . '"';
-	
-			if ( $container && $menu )
-				$menu = "<{$container}{$container_id}{$container_class}>{$menu}</{$container}>\n";
-			
-			$menu = apply_filters( 'wp_page_menu', $menu, $args );
-			if ( $args['echo'] )
-				echo $menu;
-			else
-				return $menu;
+		$defaults = array(
+			'sort_column'     => 'menu_order, post_title',
+			'menu_class'      => 'menu',
+			'echo'            => true,
+			'link_before'     => '',
+			'link_after'      => '',
+			'container'       => 'div',
+			'container_id'    => '',
+			'container_class' => ''
+		);
+		$args = wp_parse_args( $args, $defaults );
+		$args = apply_filters( 'wp_page_menu_args', $args );
+
+		$menu = '';
+
+		$list_args = $args;
+
+		// Show Home in the menu
+		if ( ! empty($args['show_home']) ) {
+				if ( true === $args['show_home'] || '1' === $args['show_home'] || 1 === $args['show_home'] )
+						$text = __('Home');
+				else
+						$text = $args['show_home'];
+				$class = '';
+				if ( is_front_page() && !is_paged() )
+						$class = 'class="current_page_item"';
+				$menu .= '<li ' . $class . '><a href="' . home_url( '/' ) . '" title="' . esc_attr($text) . '">' . $args['link_before'] . $text . $args['link_after'] . '</a></li>';
+				// If the front page is a page, add it to the exclude list
+				if (get_option('show_on_front') == 'page') {
+						if ( !empty( $list_args['exclude'] ) ) {
+								$list_args['exclude'] .= ',';
+						} else {
+								$list_args['exclude'] = '';
+						}
+						$list_args['exclude'] .= get_option('page_on_front');
+				}
+		}
+
+		$list_args['echo'] = false;
+		$list_args['title_li'] = '';
+		$menu .= str_replace( array( "\r", "\n", "\t" ), '', wp_list_pages($list_args) );
+
+		$menu_class = '';
+		if ( $args['menu_class'] )
+			$menu_class = ' class="' . esc_attr( $args['menu_class'] ) . '"';
+
+		if ( $menu )
+			$menu = "<ul{$menu_class}>{$menu}</ul>";
+
+		$container = '';
+		if ( $args['container'] )
+			$container = ( $args['container'] == 'nav' ) ? 'nav' : 'div';
+
+		$container_id = '';
+		if ( $args['container_id'] )
+			$container_id = ' id="' . esc_attr( $args['container_id'] ) . '"';
+
+		$container_class = '';
+		if ( $args['container_class'] )
+			$container_class = ' class="' . esc_attr( $args['container_class'] ) . '"';
+
+		if ( $container && $menu )
+			$menu = "<{$container}{$container_id}{$container_class}>{$menu}</{$container}>\n";
+
+		$menu = apply_filters( 'wp_page_menu', $menu, $args );
+		if ( $args['echo'] )
+			echo $menu;
+		else
+			return $menu;
 	}
 }
 
@@ -779,9 +774,7 @@ if ( ! function_exists( 'noctilucent_section_header' ) ) {
 			$search_label = ( $search_count == 1 ) ? 'result' : 'results';
 			$section_header = $search_count . ' search ' . $search_label . ' for &ldquo;' . get_search_query() . '&rdquo;';
 		} elseif ( is_post_type_archive( noctilucent_custom_post_types() ) ) {
-			$pt = noctilucent_custom_post_types( true );
-			$type = get_post_type();
-			$section_header = $pt[$type]->labels->name;
+			$section_header = post_type_archive_title( null, false );
 		}
 		
 		return apply_filters( 'noctilucent_section_header', $section_header );
@@ -843,33 +836,12 @@ if ( ! function_exists( 'noctilucent_custom_post_types' ) ) {
 			'public'   => true,
 			'_builtin' => false
 		);
-		$output = 'objects';
+		$output = ( $obj ) ? 'objects' : 'names';
 		$operator = 'and';
 		
 		$post_types = get_post_types( $args, $output, $operator );
 		
-		if ( ! $obj )
-			$post_types = array_keys( $post_types );
-		
 		return $post_types;
 		
 	}
-}
-
-
-/**
- * Add nextpage button to TinyMCE
- * Pluggable
- */
-if ( ! function_exists( 'noctilucent_tinymce_nextpage' ) ) {
-	function noctilucent_tinymce_nextpage( $mce_buttons ) {
-		$pos = array_search( 'wp_more', $mce_buttons, true );
-		if ( $pos !== false ) {
-			$tmp_buttons = array_slice( $mce_buttons, 0, $pos + 1 );
-			$tmp_buttons[] = 'wp_page';
-			$mce_buttons = array_merge( $tmp_buttons, array_slice( $mce_buttons, $pos + 1 ) );
-		}
-		return $mce_buttons; 
-	}
-	add_filter( 'mce_buttons', 'noctilucent_tinymce_nextpage' );
 }

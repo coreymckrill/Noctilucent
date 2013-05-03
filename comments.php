@@ -21,7 +21,7 @@ endif; ?>
 
 <?php if ( get_option( 'page_comments' ) ) :
 global $cpage; if ( $cpage == '' ) $cpage = 1;
-$nocti_listcounter = ( $cpage - 1 ) * get_option( 'comments_per_page' ); ?>
+$noctilucent_listcounter = ( $cpage - 1 ) * get_option( 'comments_per_page' ); ?>
                 <style type="text/css">
                 .commentlist { list-style-type: none; counter-reset: item <?php echo $noctilucent_listcounter; ?>; position: relative; }
                 .commentlist > li { counter-increment: item; }

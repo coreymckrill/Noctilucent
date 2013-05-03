@@ -1,15 +1,14 @@
 <?php do_action( 'noctilucent_before_loop' ); ?>
 
-            <section class="content">
+	<section class="content">
+
 <?php
 do_action( 'noctilucent_prepend_to_content' );
 	// noctilucent_insert_section_header
 	// noctilucent_insert_search_header
 
-// The Loop
+// Begin loop
 if ( have_posts() ) :
-
-do_action( 'noctilucent_prepend_to_content' );
 
 while ( have_posts() ) : the_post();
 	
@@ -19,10 +18,6 @@ while ( have_posts() ) : the_post();
 		// noctilucent_load_cpt
 
 endwhile;
-
-do_action( 'noctilucent_append_to_content' );
-	// noctilucent_load_comments
-	// noctilucent_insert_archive_pagination
 
 // No posts
 else :
@@ -34,12 +29,14 @@ else :
     }
 
 endif;
+// End loop
 
 do_action( 'noctilucent_append_to_content' );
 	// noctilucent_load_comments
 	// noctilucent_insert_archive_pagination
 ?>
-            </section>
+
+	</section>
 
 <?php do_action( 'noctilucent_after_loop' );
 	// noctilucent_insert_default_sidebar
