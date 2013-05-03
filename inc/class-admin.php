@@ -16,7 +16,7 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
 			//add_filter( 'menu_order', array( &$this, 'custom_menu_order' ) );
 			
 			// Remove top level menu items
-            //add_action( 'admin_menu', array( &$this, 'remove_menu_items' ) );
+            add_action( 'admin_menu', array( &$this, 'remove_menu_items' ) );
             
 			// Remove submenu items
             add_action( 'admin_init', array( &$this, 'remove_submenu_items' ) );
@@ -29,15 +29,22 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
             
 			// Remove meta boxes from built-in post types
             //add_action( 'admin_menu', array( &$this, 'remove_builtin_meta_boxes' ) );
-			
+
+	        // Suppress update notifications for non-admins
+	        if ( ! current_user_can( 'update_plugins' ) ) {
+		        add_action( 'init', create_function( '$a', "remove_action( 'init', 'wp_version_check' );" ), 2 );
+		        add_filter( 'pre_option_update_core', create_function( '$a', "return null;" ) );
+	        }
+
+	        // Edit first row of Visual Editor buttons
+	        add_filter( 'mce_buttons', array( &$this, 'tinymce_nextpage' ) );
+
 			// Set visual editor's image link default to none
 			add_action( 'admin_init', array( &$this, 'imglink_default' ), 10 );
-			
-			// Suppress update notifications for non-admins
-			if ( ! current_user_can( 'update_plugins' ) ) {
-				add_action( 'init', create_function( '$a', "remove_action( 'init', 'wp_version_check' );" ), 2 );
-				add_filter( 'pre_option_update_core', create_function( '$a', "return null;" ) );
-			}
+
+	        // Visual editor styling
+	        add_editor_style( noctilucent_theme_url( 'css/editor-style.css' ) );
+
         } // End function __construct
         
 		function custom_menu_order( $menu_ord ) {
@@ -50,17 +57,28 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
 		}
 		
         function remove_menu_items() {
-            //remove_menu_page( 'index.php' );                // Dashboard
-			//remove_menu_page( 'edit.php' );                 // Posts
-            //remove_menu_page( 'upload.php' );               // Media
-            remove_menu_page( 'link-manager.php' );           // Links
-            //remove_menu_page( 'edit.php?post_type=page' );  // Pages
-            //remove_menu_page( 'edit-comments.php' );        // Comments
-            //remove_menu_page( 'themes.php' );               // Appearance
-            //remove_menu_page( 'plugins.php' );              // Plugins
-            //remove_menu_page( 'users.php' );                // Users
-            //remove_menu_page( 'tools.php' );                // Tools
-            //remove_menu_page( 'options-general.php' );      // Settings
+            $menu_items = array(
+	            'Dashboard'  => 'index.php',
+	            'Posts'      => 'edit.php',
+	            'Media'      => 'upload.php',
+	            'Links'      => 'link-manager.php',
+	            'Pages'      => 'edit.php?post_type=page',
+	            'Comments'   => 'edit-comments.php',
+	            'Appearance' => 'themes.php',
+	            'Plugins'    => 'plugins.php',
+	            'Users'      => 'users.php',
+	            'Tools'      => 'tools.php',
+	            'Settings'   => 'options-general.php'
+            );
+
+	        $remove = apply_filters( 'noctilucent_admin_remove_menu_items', array(
+				'Links'
+		    ) );
+
+	        foreach ( $remove as $name ) {
+		        if ( isset( $menu_items[$name] ) )
+		            remove_menu_page( $menu_items[$name] );
+	        }
         } // End function remove_menu_items
         
         function remove_submenu_items() {
@@ -76,8 +94,8 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
             //unset( $wp_meta_boxes['dashboard']['normal']['core']['dashboard_recent_comments'] );
             //unset( $wp_meta_boxes['dashboard']['normal']['core']['dashboard_incoming_links'] );
             //unset( $wp_meta_boxes['dashboard']['normal']['core']['dashboard_right_now'] );
-            //unset( $wp_meta_boxes['dashboard']['side']['core']['dashboard_primary'] );
-            //unset( $wp_meta_boxes['dashboard']['side']['core']['dashboard_secondary'] );
+            unset( $wp_meta_boxes['dashboard']['side']['core']['dashboard_primary'] );
+            unset( $wp_meta_boxes['dashboard']['side']['core']['dashboard_secondary'] );
             //unset( $wp_meta_boxes['dashboard']['side']['core']['dashboard_quick_press'] );
             //unset( $wp_meta_boxes['dashboard']['side']['core']['dashboard_recent_drafts'] );
         } // End function remove_dashboard_widgets
@@ -105,7 +123,18 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
             //remove_meta_box( 'commentsdiv', 'page', 'normal' );
             //remove_meta_box( 'authordiv', 'page', 'normal' );
         } // End function remove_builtin_meta_boxes
-		
+
+	    // Add nextpage button to TinyMCE
+	    function tinymce_nextpage( $mce_buttons ) {
+		    $pos = array_search( 'wp_more', $mce_buttons, true );
+		    if ( $pos !== false ) {
+			    $tmp_buttons = array_slice( $mce_buttons, 0, $pos + 1 );
+			    $tmp_buttons[] = 'wp_page';
+			    $mce_buttons = array_merge( $tmp_buttons, array_slice( $mce_buttons, $pos + 1 ) );
+		    }
+		    return $mce_buttons;
+	    }
+
 		// Set image link default to none
 		// http://andrewnorcross.com/tutorials/functions-file/stop-hyperlinking-images/
 		function imglink_default() {
@@ -120,5 +149,3 @@ if ( ! class_exists( 'Noctilucent_Admin' ) ) {
 } // End if
 
 $nocti_admin = new Noctilucent_Admin();
-
-?>
