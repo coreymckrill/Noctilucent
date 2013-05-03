@@ -15,19 +15,6 @@
 @import "inc/variables";  // Project variables
 @import "inc/mixins";     // Custom mixins
 
-// Normalize
-@include h5bp-normalize;  // CSS Reset
-
 // Primary styles
-@import "inc/layout";     // Layout
 @import "inc/typography"; // Typography
-@import "inc/primary";    // Primary styles
-@import "inc/pages";      // Specific pages
 @import "inc/wordpress";  // WordPress classes
-@import "inc/plugins";    // Plugin styles
-
-// Misc.
-//@include h5bp-helpers;  // Uncomment for helper classes
-@include h5bp-chromeframe;// Chromeframe warning styles
-@include h5bp-media;      // Print styles
-
