@@ -80,7 +80,7 @@ if ( ! function_exists( 'noctilucent_enqueue_styles' ) ) {
 if ( ! function_exists( 'noctilucent_load_jquery' ) ) {
     function noctilucent_load_jquery() {
 		
-		$jquery_version = apply_filters( 'noctilucent_jquery_version', '1.8.3' );
+		$jquery_version = apply_filters( 'noctilucent_jquery_version', '1.9.1' );
 		
 		// Only load on front end. The latest jQuery version may not be compatible
 		// with WordPress admin scripts.
