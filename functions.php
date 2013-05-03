@@ -184,19 +184,10 @@ if ( ! function_exists( 'noctilucent_disable_feed' ) ) {
 if ( ! function_exists( 'noctilucent_theme_support' ) ) {
     function noctilucent_theme_support() {
 		add_theme_support( 'automatic-feed-links' );
-		add_theme_support( 'post-thumbnails' );
-		/* add_theme_support( 'post-formats', array(
-			'aside',
-			'gallery',
-			'link',
-			'image',
-			'quote',
-			'status',
-			'video',
-			'audio',
-			'chat'
-		) ); */
-		//add_editor_style( '/css/layout-style.css' );
+	    if ( $post_thumbnails = apply_filters( 'noctilucent_post_thumbnails', array( 'post', 'page' ) ) )
+			add_theme_support( 'post-thumbnails', $post_thumbnails );
+		if ( $post_formats = apply_filters( 'noctilucent_post_formats', false ) )
+	        add_theme_support( 'post-formats', $post_formats );
     }
     add_action( 'after_setup_theme', 'noctilucent_theme_support' );
 }
