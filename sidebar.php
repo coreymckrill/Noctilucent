@@ -1,6 +1,6 @@
-            <section id="sidebar-main" class="sidebar" role="complementary">
+            <section class="sidebar sidebar-default" role="complementary">
                 <ul>
-            <?php if ( ! dynamic_sidebar( 'sidebar-main' ) ) : ?>
+            <?php if ( ! dynamic_sidebar( 'sidebar-default' ) ) : ?>
 
                             <?php
                             $args = array(
@@ -21,6 +21,5 @@
                             the_widget( 'WP_Widget_Meta', array( 'title' => __( 'Meta' ) ), $args ); ?>
 
             <?php endif; ?>
-
                 </ul>
             </section>

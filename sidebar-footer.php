@@ -1,5 +1,5 @@
         <?php if ( is_active_sidebar( 'sidebar-footer' ) ) : ?>
-            <section id="sidebar-footer" class="sidebar">
+            <section class="sidebar sidebar-footer">
                 <ul>
                     <?php dynamic_sidebar( 'sidebar-footer' ); ?>
                 </ul>

@@ -32,11 +32,11 @@
 		// noctilucent_chromeframe
 	?>
 
-	<header id="header-banner" role="banner">
+	<header class="site-header" role="banner">
 		<?php do_action( 'noctilucent_prepend_to_header' ); ?>
 		<hgroup>
-			<h1><a href="<?php echo home_url(); ?>/"><?php bloginfo( 'name' ); ?></a></h1>
-			<p class="blog-description"><?php bloginfo( 'description' ); ?></p>
+			<h1 class="site-header-title"><a href="<?php echo trailingslashit( home_url() ); ?>"><?php bloginfo( 'name' ); ?></a></h1>
+			<h2 class="site-header-description"><?php bloginfo( 'description' ); ?></h2>
 		</hgroup>
 		<?php do_action( 'noctilucent_append_to_header' ); ?>
 	</header>
@@ -45,4 +45,4 @@
 	   // noctilucent_insert_primary_nav
 	?>
 	
-    <div id="main" role="main">
+    <div id="main" class="site-main" role="main">

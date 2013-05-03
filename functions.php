@@ -223,8 +223,8 @@ if ( ! function_exists( 'noctilucent_menus' ) ) {
 if ( ! function_exists( 'noctilucent_sidebars' ) ) {
     function noctilucent_sidebars() {
 		register_sidebar( array(
-			'id'            => 'sidebar-main',
-			'name'          => 'Main Widget Area',
+			'id'            => 'sidebar-default',
+			'name'          => 'Default Widget Area',
 			'description'   => 'Widgets placed here will appear in the side column.',
 			'before_widget' => '<li id="%1$s" class="widget %2$s">',
 			'after_widget'  => '</li>',
@@ -366,7 +366,7 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 		function noctilucent_insert_primary_nav() {
 			wp_nav_menu( array(
 				'container'         => 'nav',
-				'container_id'      => 'nav-primary',
+				'container_class'   => 'site-menu',
 				'theme_location'    => 'primary',
 				'fallback_cb'       => 'noctilucent_page_menu'
 			) );

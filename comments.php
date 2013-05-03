@@ -10,7 +10,7 @@ if ( post_password_required() ) : ?>
     return;
 endif; ?>
 
-            <aside id="comments">
+            <aside class="comments">
                 <header>
                     <p><?php comments_number('No responses', 'One response', '% responses' ); ?> to &ldquo;<?php the_title(); ?>&rdquo;</p>
                 </header>
@@ -23,14 +23,14 @@ endif; ?>
 global $cpage; if ( $cpage == '' ) $cpage = 1;
 $nocti_listcounter = ( $cpage - 1 ) * get_option( 'comments_per_page' ); ?>
                 <style type="text/css">
-                #commentlist { list-style-type: none; counter-reset: item <?php echo $nocti_listcounter; ?>; position: relative; }
-                #commentlist > li { counter-increment: item; }
-                #commentlist > li:before { content: counter(item) ". "; position: absolute; left: 0; }
-                .ie6 #commentlist, .ie7 #commentlist { list-style-type: decimal; }
+                .commentlist { list-style-type: none; counter-reset: item <?php echo $noctilucent_listcounter; ?>; position: relative; }
+                .commentlist > li { counter-increment: item; }
+                .commentlist > li:before { content: counter(item) ". "; position: absolute; left: 0; }
+                .lt-ie8 .commentlist { list-style-type: decimal; }
                 </style>
 <?php endif; ?>
 
-                <ol id="commentlist">
+                <ol class="commentlist">
                     <?php wp_list_comments( array(
                         'type' => 'comment',
                         'callback' => 'noctilucent_comment_markup'
