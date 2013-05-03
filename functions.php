@@ -276,8 +276,8 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 		add_action( 'noctilucent_after_header', 'noctilucent_insert_primary_nav' );
 
 		// Pre-content insertions
-		add_action( 'noctilucent_before_loop', 'noctilucent_insert_section_header' );
-		add_action( 'noctilucent_before_loop', 'noctilucent_insert_search_header' );
+		add_action( 'noctilucent_prepend_to_content', 'noctilucent_insert_section_header' );
+		add_action( 'noctilucent_prepend_to_content', 'noctilucent_insert_search_header' );
 
 		// Conditionals for loading content templates
 		add_filter( 'noctilucent_content_template', 'noctilucent_load_page', 10, 1 );
@@ -287,6 +287,9 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 		// Post-content insertions
 		add_action( 'noctilucent_append_to_content', 'noctilucent_load_comments' );
 		add_action( 'noctilucent_append_to_content', 'noctilucent_insert_archive_pagination' );
+
+		// Sidebars
+		add_action( 'noctilucent_after_loop', 'noctilucent_insert_default_sidebar' );
 		
 		// Insert copyright string and credit string after footer
 		add_action( 'noctilucent_after_footer', 'noctilucent_insert_copyright' );
@@ -476,6 +479,16 @@ if ( ! function_exists( 'noctilucent_theme_setup' ) ) {
 		}
 	}
 	
+	/**
+	 * Insert default sidebar
+	 */
+	if ( ! function_exists( 'noctilucent_insert_default_sidebar' ) ) {
+		function noctilucent_insert_default_sidebar() {
+			if ( apply_filters( 'noctilucent_sidebar_switch', true ) )
+				get_sidebar( apply_filters( 'noctilucent_sidebar_template', null ) );
+		}
+	}
+
 	/**
 	 * Insert copyright string
 	 * Pluggable

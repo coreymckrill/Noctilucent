@@ -2,9 +2,4 @@
 
 <?php get_template_part( 'loop', apply_filters( 'noctilucent_loop_template', 'index' ) ); ?>
 
-<?php
-if( apply_filters( 'noctilucent_sidebar_switch', true ) )
-	get_sidebar( apply_filters( 'noctilucent_sidebar_template', null ) );
-?>
-
-<?php get_footer(); ?>
+<?php get_footer( apply_filters( 'noctilucent_footer_template', null ) ); ?>

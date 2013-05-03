@@ -1,6 +1,8 @@
+<?php do_action( 'noctilucent_before_loop' ); ?>
+
             <section class="content">
 <?php
-do_action( 'noctilucent_before_loop' );
+do_action( 'noctilucent_prepend_to_content' );
 	// noctilucent_insert_section_header
 	// noctilucent_insert_search_header
 
@@ -33,6 +35,12 @@ else :
 
 endif;
 
-do_action( 'noctilucent_after_loop' );
+do_action( 'noctilucent_append_to_content' );
+	// noctilucent_load_comments
+	// noctilucent_insert_archive_pagination
 ?>
             </section>
+
+<?php do_action( 'noctilucent_after_loop' );
+	// noctilucent_insert_default_sidebar
+?>
